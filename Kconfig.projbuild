@@ -1,0 +1,24 @@
+menu "EBLi Configuration"
+
+    config ENABLE_EBLI_FS
+        bool "Enable FS"
+        default false
+
+    config ENABLE_EBLI_WIFI
+        bool "Enable Wifi"
+        depends on ENABLE_EBLI_FS
+        default false
+
+    config EBLI_WIFI_PROVISION_POP
+        string "Wifi provisioning Proof-of-Possession"
+        depends on ENABLE_EBLI_WIFI
+        default "abcd1234"
+        help
+            Auto provisioning Proof-of-Possession
+
+    config ENABLE_EBLI_MQTT
+        bool "Enable MQTT"
+        depends on ENABLE_EBLI_WIFI
+        default false
+        
+endmenu
