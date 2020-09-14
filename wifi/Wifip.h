@@ -1,5 +1,5 @@
-#ifndef ONEWHEELMONITOR_WIFIP_H
-#define ONEWHEELMONITOR_WIFIP_H
+#ifndef EBLI_WIFIP_H
+#define EBLI_WIFIP_H
 
 #include <esp_err.h>
 #include <wifi_provisioning/manager.h>
@@ -25,4 +25,4 @@ public:
 
 }
 
-#endif //ONEWHEELMONITOR_WIFIP_H
+#endif //EBLI_WIFIP_H
