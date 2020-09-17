@@ -19,11 +19,19 @@ if(CONFIG_ENABLE_EBLI_WIFI)
 endif()
 
 if(CONFIG_ENABLE_EBLI_MQTT)
-#    set(EBLi_SRCS ${EBLi_SRCS} mqtt/Mqtt.cpp)
+    #    set(EBLi_SRCS ${EBLi_SRCS} mqtt/Mqtt.cpp)
     list(APPEND EBLi_SRCS mqtt/Mqtt.cpp mqtt/Mqttp.cpp mqtt/MqttSubscriber.cpp mqtt/MqttPublisher.cpp)
     list(APPEND EBLi_PUBLIC_INCLUDE_DIRS mqtt/public)
     #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} wifi_provisioning)
     list(APPEND EBLi_DEPENDENCIES mqtt)
+endif()
+
+if(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    #    set(EBLi_SRCS ${EBLi_SRCS} mqtt/Mqtt.cpp)
+    list(APPEND EBLi_SRCS config/ConfigManager.cpp)
+    list(APPEND EBLi_PUBLIC_INCLUDE_DIRS config/public)
+    #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} wifi_provisioning)
+#    list(APPEND EBLi_DEPENDENCIES mqtt)
 endif()
 
 idf_component_register(
