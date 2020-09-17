@@ -14,7 +14,7 @@ static EventGroupHandle_t ota_updater_event_group;
 {
     ESP_LOGI(UPDATER_LOG_TAG, "Starting OTA Update Task...");
 
-    auto updater = (OtaUpdaterPrivate*)pvParameter;
+    auto updater = static_cast<OtaUpdaterPrivate*>(pvParameter);
 
     while (true) { // this will only loop if the update fails
         xEventGroupWaitBits(ota_updater_event_group, UPDATER_RUNNING_BIT, false, false, portMAX_DELAY);
@@ -56,6 +56,9 @@ bool OtaUpdater::startUpdate()
     if (m_updater->isActive()) {
         return false;
     }
+
+    m_updater->httpConfig.disable_auto_redirect = false;
+    m_updater->httpConfig.max_redirection_count = 10;
 
     m_updater->lastError = esp_https_ota_begin(&m_updater->otaConfig, &m_updater->otaHandle);
     if (m_updater->lastError == ESP_OK) {

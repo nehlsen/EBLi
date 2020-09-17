@@ -21,7 +21,7 @@ void OtaUpdaterPrivate::work()
     esp_app_desc_t updateInfo;
     lastError = esp_https_ota_get_img_desc(otaHandle, &updateInfo);
     if (updateInfo.magic_word != ESP_APP_DESC_MAGIC_WORD) {
-        ESP_LOGE(UPDATER_LOG_TAG, "Update info: magic word mismatch!");
+        ESP_LOGE(UPDATER_LOG_TAG, "Update info: magic word mismatch! (update:0x%x != mine:0x%x)", updateInfo.magic_word, ESP_APP_DESC_MAGIC_WORD);
         lastError = ESP_ERR_OTA_VALIDATE_FAILED;
     }
     if (lastError == ESP_OK) {
