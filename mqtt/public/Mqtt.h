@@ -3,6 +3,7 @@
 
 #include <sdkconfig.h>
 #include <string>
+#include "MqttSubscriber.h"
 
 namespace EBLi
 {
@@ -11,7 +12,6 @@ namespace EBLi
 class ConfigManager;
 #endif
 
-class MqttSubscriber;
 class MqttPublisher;
 class Mqttp;
 
@@ -27,7 +27,7 @@ public:
 
     bool isConnected() const;
 
-    void addSubscriber(MqttSubscriber *subscriber);
+    MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb);
     MqttPublisher *createPublisher(std::string topic);
 
 private:

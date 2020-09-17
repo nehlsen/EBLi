@@ -59,13 +59,16 @@ bool Mqttp::isConnected() const
     return m_isConnected;
 }
 
-void Mqttp::addSubscriber(MqttSubscriber *subscriber)
+MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb)
 {
+    auto subscriber = new MqttSubscriber(topic, cb); // FIXME delete subscribers in DESTRUCTOR
     m_subscribers.push_back(subscriber);
 
     if (isConnected()) {
         setupOneSubscription(subscriber);
     }
+
+    return subscriber;
 }
 
 MqttPublisher *Mqttp::createPublisher(std::string topic)
@@ -112,6 +115,7 @@ void Mqttp::onMqttData(esp_mqtt_event_handle_t event)
 {
     for (auto subscriber : m_subscribers) {
         if (subscriber->matchesTopic(event->topic)) {
+            // TODO maybe forward the matched topic (for the subscriber to know whether it was group or device topic)
             subscriber->handleEventData(event->data, event->data_len);
         }
     }

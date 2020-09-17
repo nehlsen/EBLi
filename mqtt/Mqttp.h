@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 #include "mqtt_client.h"
+#include "MqttSubscriber.h"
 
 namespace EBLi
 {
 
-class MqttSubscriber;
 class MqttPublisher;
 
 class Mqttp
@@ -18,8 +18,9 @@ public:
 
     bool isConnected() const;
 
-    void addSubscriber(MqttSubscriber *subscriber);
+    MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb);
     MqttPublisher *createPublisher(std::string topic);
+
     void publish(MqttPublisher *publisher, const std::string &value);
 
     void startMqttClient();

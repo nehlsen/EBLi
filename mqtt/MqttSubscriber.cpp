@@ -10,8 +10,8 @@ std::string MqttSubscriber::getTopic() const
     return m_topic;
 }
 
-MqttSubscriber::MqttSubscriber(std::string topic):
-    m_topic(std::move(topic))
+MqttSubscriber::MqttSubscriber(std::string topic, SubscriptionCallbackType cb):
+    m_topic(std::move(topic)), m_subscriptionCallback(cb)
 {}
 
 void MqttSubscriber::setDeviceTopic(const std::string &deviceTopic)
@@ -41,7 +41,7 @@ bool MqttSubscriber::matchesTopic(char *topic) const
 
 void MqttSubscriber::handleEventData(char *data, int data_len)
 {
-    // TODO
+    m_subscriptionCallback(std::string(data, data_len));
 }
 
 }

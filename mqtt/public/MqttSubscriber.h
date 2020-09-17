@@ -2,6 +2,7 @@
 #define EBLI_MQTT_SUBSCRIBER_H
 
 #include <string>
+#include <functional>
 
 namespace EBLi
 {
@@ -13,11 +14,14 @@ friend class Mqttp;
 public:
     std::string getTopic() const;
 
+    typedef std::function<void(const std::string &value)> SubscriptionCallbackType;
+
 protected:
-    explicit MqttSubscriber(std::string topic);
+    MqttSubscriber(std::string topic, SubscriptionCallbackType cb);
 
 private:
     const std::string m_topic;
+    SubscriptionCallbackType m_subscriptionCallback;
 
     void setDeviceTopic(const std::string &deviceTopic);
     std::string getDeviceTopic() const;
