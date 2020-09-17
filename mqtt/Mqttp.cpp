@@ -160,7 +160,7 @@ std::string Mqttp::getMqttBroker() const
 #endif
 
     const std::string mqttPrefix("mqtt://");
-    if (broker.substr(mqttPrefix.length()) != mqttPrefix) {
+    if (broker.substr(0, mqttPrefix.length()) != mqttPrefix) {
         broker = mqttPrefix + broker;
     }
 
