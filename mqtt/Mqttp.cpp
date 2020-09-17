@@ -113,10 +113,21 @@ void Mqttp::onMqttDisconnected()
 
 void Mqttp::onMqttData(esp_mqtt_event_handle_t event)
 {
+    std::string topic(event->topic, event->topic_len);
+    ESP_LOGD(LOG_TAG, "onMqttData, topic: '%s'", topic.c_str());
+
     for (auto subscriber : m_subscribers) {
-        if (subscriber->matchesTopic(event->topic)) {
+        ESP_LOGV(LOG_TAG, "onMqttData, subscriber: '%s' & '%s'",
+                 subscriber->getDeviceTopic().c_str(),
+                 subscriber->getGroupTopic().c_str()
+                 );
+
+        if (subscriber->matchesTopic(topic)) {
+            ESP_LOGV(LOG_TAG, "onMqttData, MATCH");
             // TODO maybe forward the matched topic (for the subscriber to know whether it was group or device topic)
             subscriber->handleEventData(event->data, event->data_len);
+        } else {
+            ESP_LOGV(LOG_TAG, "onMqttData, NO MATCH");
         }
     }
 }

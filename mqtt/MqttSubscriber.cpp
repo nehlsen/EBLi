@@ -34,7 +34,7 @@ std::string MqttSubscriber::getGroupTopic() const
     return m_groupTopic;
 }
 
-bool MqttSubscriber::matchesTopic(char *topic) const
+bool MqttSubscriber::matchesTopic(const std::string &topic) const
 {
     return m_deviceTopic == topic || m_groupTopic == topic;
 }
