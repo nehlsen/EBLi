@@ -5,7 +5,7 @@
 
 namespace EBLi {
 
-static const char *UPDATER_LOG_TAG = "OtaUpdater";
+static const char *UPDATER_LOG_TAG = "EBLi:OtaUpdater";
 
 OtaUpdaterPrivate::OtaUpdaterPrivate():
     httpConfig(), otaConfig({.http_config = &httpConfig})

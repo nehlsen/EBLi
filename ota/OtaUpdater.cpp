@@ -5,7 +5,7 @@
 
 namespace EBLi {
 
-static const char *UPDATER_LOG_TAG = "OtaUpdater";
+static const char *UPDATER_LOG_TAG = "EBLi:OtaUpdater";
 
 #define UPDATER_RUNNING_BIT BIT1
 static EventGroupHandle_t ota_updater_event_group;
