@@ -3,6 +3,8 @@
 
 #include <string>
 
+class cJSON;
+
 namespace EBLi
 {
 
@@ -15,6 +17,7 @@ public:
     std::string getTopic() const;
 
     void publishValue(uint8_t value);
+    void publishValue(cJSON *jsonObject);
     void publishValue(std::string value);
     // TODO publish: int, float, JSON, ...
 

@@ -1,6 +1,7 @@
 #include "MqttPublisher.h"
 #include "Mqttp.h"
 #include <utility>
+#include <cJSON.h>
 
 namespace EBLi
 {
@@ -17,6 +18,13 @@ std::string MqttPublisher::getTopic() const
 void MqttPublisher::publishValue(uint8_t value)
 {
     publishValue(std::to_string(value));
+}
+
+void MqttPublisher::publishValue(cJSON *jsonObject)
+{
+    char *jsonBuffer = cJSON_PrintUnformatted(jsonObject);
+    publishValue(jsonBuffer);
+    free(jsonBuffer);
 }
 
 void MqttPublisher::publishValue(std::string value)
