@@ -26,20 +26,28 @@ if(CONFIG_ENABLE_EBLI_MQTT)
     list(APPEND EBLi_DEPENDENCIES mqtt)
 endif()
 
+if(CONFIG_ENABLE_EBLI_CONFIG_OTA)
+    #    set(EBLi_SRCS ${EBLi_SRCS} mqtt/Mqtt.cpp)
+    list(APPEND EBLi_SRCS ota/OtaUpdater.cpp ota/OtaUpdaterPrivate.cpp)
+    list(APPEND EBLi_PUBLIC_INCLUDE_DIRS ota/public)
+    #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} wifi_provisioning)
+    list(APPEND EBLi_DEPENDENCIES esp_https_ota app_update)
+endif()
+
 if(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
     #    set(EBLi_SRCS ${EBLi_SRCS} mqtt/Mqtt.cpp)
     list(APPEND EBLi_SRCS config/ConfigManager.cpp)
     list(APPEND EBLi_PUBLIC_INCLUDE_DIRS config/public)
     #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} wifi_provisioning)
-#    list(APPEND EBLi_DEPENDENCIES mqtt)
+    #    list(APPEND EBLi_DEPENDENCIES mqtt)
 endif()
 
 idf_component_register(
         SRCS ${EBLi_SRCS}
         INCLUDE_DIRS ${EBLi_PUBLIC_INCLUDE_DIRS}
         PRIV_INCLUDE_DIRS fs wifi
-        PRIV_REQUIRES spiffs nvs_flash wifi_provisioning mqtt
-#        PRIV_REQUIRES ${EBLi_DEPENDENCIES}
+        PRIV_REQUIRES spiffs nvs_flash wifi_provisioning mqtt esp_https_ota app_update
+#        PRIV_REQUIRES ${EBLi_DEPENDENCIES} # FIXME
 )
 
 # if FS

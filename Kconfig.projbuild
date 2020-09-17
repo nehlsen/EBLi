@@ -34,6 +34,10 @@ menu "EBLi Configuration"
         depends on ENABLE_EBLI_MQTT
         default "ebli-device-group"
 
+    config ENABLE_EBLI_CONFIG_OTA
+        bool "Enable OTA"
+        default false
+
     config ENABLE_EBLI_CONFIG_MANAGER
         bool "Enable Config-Manager"
         depends on ENABLE_EBLI_FS
