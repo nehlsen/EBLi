@@ -2,6 +2,9 @@
 #include <esp_log.h>
 #include <MqttSubscriber.h>
 #include <MqttPublisher.h>
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#include <ConfigManager.h>
+#endif
 
 namespace EBLi
 {
@@ -165,7 +168,7 @@ std::string Mqttp::getMqttBroker() const
     std::string broker;
 
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    broker = configManager->get("mqtt/broker", CONFIG_EBLI_MQTT_DEFAULT_BROKER);
+    broker = EBLi::ConfigManager::instance()->getValue("mqtt_broker", CONFIG_EBLI_MQTT_DEFAULT_BROKER);
 #else
     broker = CONFIG_EBLI_MQTT_DEFAULT_BROKER;
 #endif
@@ -181,7 +184,7 @@ std::string Mqttp::getMqttBroker() const
 std::string Mqttp::getDeviceTopic() const
 {
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    return configManager->get("mqtt/device_topic", CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC);
+    return EBLi::ConfigManager::instance()->getValue("mqtt_tpc_device", CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC);
 #endif
     return CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC;
 }
@@ -189,7 +192,7 @@ std::string Mqttp::getDeviceTopic() const
 std::string Mqttp::getGroupTopic() const
 {
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    return configManager->get("mqtt/group_topic", CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC);
+    return EBLi::ConfigManager::instance()->getValue("mqtt_tpc_group", CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC);
 #endif
     return CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC;
 }

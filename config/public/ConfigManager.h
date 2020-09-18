@@ -9,17 +9,21 @@ namespace EBLi {
 class ConfigManager
 {
 public:
+    static ConfigManager *init();
+    static ConfigManager *instance();
+
     bool open();
+    bool isOpen() const;
     void close();
     bool commit();
 
-    enum ConfigOptions {
-        NoOptions,
-        AutoPublishMqtt,   // publish change of value via MQTT "deviceTopic/config/KEY"
-        AutoSubscribeMqtt, // allow change of value via MQTT "deviceTopic/config/KEY" and  "groupTopic/config/KEY"
-        // TODO same for REST
-    };
-    void createConfig(const std::string &key, options);
+//    enum ConfigOptions {
+//        NoOptions,
+//        AutoPublishMqtt,   // publish change of value via MQTT "deviceTopic/config/KEY"
+//        AutoSubscribeMqtt, // allow change of value via MQTT "deviceTopic/config/KEY" and  "groupTopic/config/KEY"
+//        // TODO same for REST
+//    };
+//    void createConfig(const std::string &key, options);
 
     void setAutoCommitEnabled(bool enabled = true);
     bool isAutoCommitEnabled() const;
@@ -32,9 +36,13 @@ public:
 
     int32_t getRestartCounter();
 
-protected:
+private:
+    ConfigManager() = default;
+    static ConfigManager *s_instance;
+
     bool openNvs();
     void logNvsState();
+    bool m_isOpen = false;
 
     static bool isKeyValid(const std::string &key);
     static bool checkKeyAndLog(const std::string &key);

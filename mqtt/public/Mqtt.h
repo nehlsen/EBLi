@@ -8,10 +8,6 @@
 namespace EBLi
 {
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-class ConfigManager;
-#endif
-
 class MqttPublisher;
 class Mqttp;
 
@@ -19,10 +15,6 @@ class Mqtt
 {
 public:
     static Mqtt *init();
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    static Mqtt *init(ConfigManager *configManager);
-#endif
-
     static Mqtt *instance();
 
     bool isConnected() const;

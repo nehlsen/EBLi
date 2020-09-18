@@ -30,12 +30,10 @@ void init_all()
 #endif
 
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    auto configManager = EBLi::ConfigManager::init();
+    EBLi::ConfigManager::init();
 #endif
-#if defined(CONFIG_ENABLE_EBLI_MQTT) && defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    EBLi::Mqtt::init(configManager);
-#endif
-#if defined(CONFIG_ENABLE_EBLI_MQTT) && !defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+
+#if defined(CONFIG_ENABLE_EBLI_MQTT)
     EBLi::Mqtt::init();
 #endif
 }

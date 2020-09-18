@@ -11,12 +11,6 @@ Mqtt *Mqtt::init()
     return instance();
 }
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-Mqtt *Mqtt::init(ConfigManager *configManager)
-{
-}
-#endif
-
 Mqtt *Mqtt::instance()
 {
     if (nullptr == s_instance) {

@@ -3,16 +3,36 @@
 
 namespace EBLi {
 
-#define NVS_NAMESPACE "ebli_config"
 static const char *LOG_TAG = "EBLi:ConfigManager";
 
+#define NVS_NAMESPACE "ebli_config"
 // NOTE keys are limited to 15 characters
 #define MAXIMUM_CONFIG_KEY_LENGTH 15
 #define MAXIMUM_CONFIG_VALUE_LENGTH 64
 #define RESTART_COUNTER_KEY "restart_counter"
 
+ConfigManager *ConfigManager::s_instance = nullptr;
+
+ConfigManager *ConfigManager::init()
+{
+    return instance();
+}
+
+ConfigManager *ConfigManager::instance()
+{
+    if (nullptr == s_instance) {
+        s_instance = new ConfigManager;
+    }
+
+    return s_instance;
+}
+
 bool ConfigManager::open()
 {
+    if (isOpen()) {
+        return true;
+    }
+
     if (!openNvs()) {
         return false;
     }
@@ -20,7 +40,13 @@ bool ConfigManager::open()
     logNvsState();
     
     updateRestartCounter();
+    m_isOpen = true;
     return true;
+}
+
+bool ConfigManager::isOpen() const
+{
+    return m_isOpen;
 }
 
 bool ConfigManager::openNvs()
@@ -44,7 +70,12 @@ void ConfigManager::logNvsState()
 
 void ConfigManager::close()
 {
+    if (!isOpen()) {
+        return;
+    }
+
     nvs_close(m_nvsHandle);
+    m_isOpen = false;
 }
 
 void ConfigManager::setAutoCommitEnabled(bool enabled)
@@ -59,6 +90,10 @@ bool ConfigManager::isAutoCommitEnabled() const
 
 bool ConfigManager::commit()
 {
+    if (!isOpen()) {
+        return false;
+    }
+
     esp_err_t err = nvs_commit(m_nvsHandle);
     
     if (err != ESP_OK) {
@@ -71,6 +106,9 @@ bool ConfigManager::commit()
 
 int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) const
 {
+    if (!isOpen()) {
+        return 0;
+    }
     if (!checkKeyAndLog(key)) {
         return 0;
     }
@@ -87,6 +125,9 @@ int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) co
 
 bool ConfigManager::setValue(const std::string &key, int32_t value)
 {
+    if (!isOpen()) {
+        return false;
+    }
     if (!checkKeyAndLog(key)) {
         return false;
     }
@@ -103,6 +144,9 @@ bool ConfigManager::setValue(const std::string &key, int32_t value)
 
 std::string ConfigManager::getValue(const std::string &key, const std::string &defaultValue) const
 {
+    if (!isOpen()) {
+        return "";
+    }
     if (!checkKeyAndLog(key)) {
         return "";
     }
@@ -136,6 +180,9 @@ std::string ConfigManager::getValue(const std::string &key, const std::string &d
 
 bool ConfigManager::setValue(const std::string &key, const std::string &value)
 {
+    if (!isOpen()) {
+        return false;
+    }
     if (!checkKeyAndLog(key)) {
         return false;
     }
