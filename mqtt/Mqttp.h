@@ -21,6 +21,13 @@ public:
     MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb);
     MqttPublisher *createPublisher(std::string topic);
 
+    std::string getBroker() const;
+    void setBroker(const std::string& brokerUrl);
+    std::string getDeviceTopic() const;
+    void setDeviceTopic(const std::string& topic);
+    std::string getGroupTopic() const;
+    void setGroupTopic(const std::string& topic);
+
     void publish(MqttPublisher *publisher, const std::string &value);
 
     void startMqttClient();
@@ -35,10 +42,6 @@ private:
     std::vector<MqttSubscriber*> m_subscribers;
     void setupAllSubscriptions();
     void setupOneSubscription(MqttSubscriber *subscriber);
-
-    std::string getMqttBroker() const;
-    std::string getDeviceTopic() const;
-    std::string getGroupTopic() const;
 };
 
 }

@@ -45,7 +45,7 @@ static void mqtt_event_data(void* event_handler_arg, esp_event_base_t event_base
 
 Mqttp::Mqttp()
 {
-    const std::string broker = getMqttBroker();
+    const std::string broker = getBroker();
     esp_mqtt_client_config_t mqtt_cfg = {
             .uri = broker.c_str(),
     };
@@ -77,6 +77,67 @@ MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::Subsc
 MqttPublisher *Mqttp::createPublisher(std::string topic)
 {
     return new MqttPublisher(this, topic);
+}
+
+std::string Mqttp::getBroker() const
+{
+    std::string broker;
+
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    broker = EBLi::ConfigManager::instance()->getValue("mqtt_broker", CONFIG_EBLI_MQTT_DEFAULT_BROKER);
+#else
+    broker = CONFIG_EBLI_MQTT_DEFAULT_BROKER;
+#endif
+
+    const std::string mqttPrefix("mqtt://");
+    if (broker.substr(0, mqttPrefix.length()) != mqttPrefix) {
+        broker = mqttPrefix + broker;
+    }
+
+    return broker;
+}
+
+void Mqttp::setBroker(const std::string &brokerUrl)
+{
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    EBLi::ConfigManager::instance()->setValue("mqtt_broker", brokerUrl);
+#else
+    ESP_LOGE(LOG_TAG, "ERROR: Setting the MQTT Broker has no effect when config manager is not enabled!");
+#endif
+}
+
+std::string Mqttp::getDeviceTopic() const
+{
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    return EBLi::ConfigManager::instance()->getValue("mqtt_tpc_device", CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC);
+#endif
+    return CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC;
+}
+
+void Mqttp::setDeviceTopic(const std::string &topic)
+{
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    EBLi::ConfigManager::instance()->setValue("mqtt_tpc_device", topic);
+#else
+    ESP_LOGE(LOG_TAG, "ERROR: Setting the MQTT Device Topic has no effect when config manager is not enabled!");
+#endif
+}
+
+std::string Mqttp::getGroupTopic() const
+{
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    return EBLi::ConfigManager::instance()->getValue("mqtt_tpc_group", CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC);
+#endif
+    return CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC;
+}
+
+void Mqttp::setGroupTopic(const std::string &topic)
+{
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    EBLi::ConfigManager::instance()->setValue("mqtt_tpc_group", topic);
+#else
+    ESP_LOGE(LOG_TAG, "ERROR: Setting the MQTT Group Topic has no effect when config manager is not enabled!");
+#endif
 }
 
 void Mqttp::publish(MqttPublisher *publisher, const std::string &value)
@@ -161,40 +222,6 @@ void Mqttp::setupOneSubscription(MqttSubscriber *subscriber)
         ESP_LOGI(LOG_TAG, "Subscribed to \"%s\"", groupTopic.c_str());
         subscriber->setGroupTopic(groupTopic);
     }
-}
-
-std::string Mqttp::getMqttBroker() const
-{
-    std::string broker;
-
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    broker = EBLi::ConfigManager::instance()->getValue("mqtt_broker", CONFIG_EBLI_MQTT_DEFAULT_BROKER);
-#else
-    broker = CONFIG_EBLI_MQTT_DEFAULT_BROKER;
-#endif
-
-    const std::string mqttPrefix("mqtt://");
-    if (broker.substr(0, mqttPrefix.length()) != mqttPrefix) {
-        broker = mqttPrefix + broker;
-    }
-
-    return broker;
-}
-
-std::string Mqttp::getDeviceTopic() const
-{
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    return EBLi::ConfigManager::instance()->getValue("mqtt_tpc_device", CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC);
-#endif
-    return CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC;
-}
-
-std::string Mqttp::getGroupTopic() const
-{
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    return EBLi::ConfigManager::instance()->getValue("mqtt_tpc_group", CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC);
-#endif
-    return CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC;
 }
 
 }

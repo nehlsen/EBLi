@@ -35,6 +35,36 @@ MqttPublisher *Mqtt::createPublisher(std::string topic)
     return m_mqtt->createPublisher(topic);
 }
 
+std::string Mqtt::getBroker() const
+{
+    return m_mqtt->getBroker();
+}
+
+void Mqtt::setBroker(const std::string &brokerUrl)
+{
+    m_mqtt->setBroker(brokerUrl);
+}
+
+std::string Mqtt::getDeviceTopic() const
+{
+    return m_mqtt->getDeviceTopic();
+}
+
+void Mqtt::setDeviceTopic(const std::string &topic)
+{
+    m_mqtt->setDeviceTopic(topic);
+}
+
+std::string Mqtt::getGroupTopic() const
+{
+    return m_mqtt->getGroupTopic();
+}
+
+void Mqtt::setGroupTopic(const std::string &topic)
+{
+    m_mqtt->setGroupTopic(topic);
+}
+
 Mqtt::Mqtt()
 {
     m_mqtt = new Mqttp;
