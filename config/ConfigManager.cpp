@@ -15,7 +15,9 @@ ConfigManager *ConfigManager::s_instance = nullptr;
 
 ConfigManager *ConfigManager::init()
 {
-    return instance();
+    ConfigManager *singleton = instance();
+    singleton->open();
+    return singleton;
 }
 
 ConfigManager *ConfigManager::instance()
@@ -107,10 +109,10 @@ bool ConfigManager::commit()
 int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) const
 {
     if (!isOpen()) {
-        return 0;
+        return defaultValue;
     }
     if (!checkKeyAndLog(key)) {
-        return 0;
+        return defaultValue;
     }
 
     int32_t value = defaultValue;
@@ -145,14 +147,13 @@ bool ConfigManager::setValue(const std::string &key, int32_t value)
 std::string ConfigManager::getValue(const std::string &key, const std::string &defaultValue) const
 {
     if (!isOpen()) {
-        return "";
+        return defaultValue;
     }
     if (!checkKeyAndLog(key)) {
-        return "";
+        return defaultValue;
     }
     if (defaultValue.length() > MAXIMUM_CONFIG_VALUE_LENGTH) {
         ESP_LOGW(LOG_TAG, "Default value for \"%s\" is too long", key.c_str());
-        return "";
     }
 
     size_t required_size;
