@@ -3,6 +3,8 @@
 
 #include <nvs.h>
 #include <string>
+#include <vector>
+#include "ConfigProperty.h"
 
 namespace EBLi {
 
@@ -24,6 +26,8 @@ public:
 //        // TODO same for REST
 //    };
 //    void createConfig(const std::string &key, options);
+//    template<typename T> ConfigProperty<T> *createConfig(const std::string &key);
+    ConfigProperty *property(const std::string &shortKey, const std::string &longKey = std::string());
 
     void setAutoCommitEnabled(bool enabled = true);
     bool isAutoCommitEnabled() const;
@@ -46,6 +50,10 @@ private:
 
     static bool isKeyValid(const std::string &key);
     static bool checkKeyAndLog(const std::string &key);
+
+    std::vector<ConfigProperty*> m_properties;
+    ConfigProperty *createProperty(const std::string &shortKey, const std::string &longKey = std::string());
+    ConfigProperty *getProperty(const std::string &shortKey);
 
     bool m_autoCommitEnabled = true;
     bool autoCommit();

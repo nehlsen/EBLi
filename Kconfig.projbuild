@@ -22,15 +22,15 @@ menu "EBLi Configuration"
         default false
 
     config EBLI_MQTT_DEFAULT_BROKER
-        string "MQTT default/fall-back Broker"
+        string "MQTT default/fall-back Broker - if no config manager or config manager has no value"
         depends on ENABLE_EBLI_MQTT
         default "mqtt://iot.eclipse.org"
     config EBLI_MQTT_DEFAULT_DEVICE_TOPIC
-        string "MQTT default/fall-back Device-Topic"
+        string "MQTT default/fall-back Device-Topic - if no config manager or config manager has no value"
         depends on ENABLE_EBLI_MQTT
         default "ebli-device"
     config EBLI_MQTT_DEFAULT_GROUP_TOPIC
-        string "MQTT default/fall-back Group-Topic"
+        string "MQTT default/fall-back Group-Topic - if no config manager or config manager has no value"
         depends on ENABLE_EBLI_MQTT
         default "ebli-device-group"
 

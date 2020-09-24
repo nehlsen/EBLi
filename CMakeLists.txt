@@ -36,7 +36,7 @@ endif()
 
 if(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
     #    set(EBLi_SRCS ${EBLi_SRCS} mqtt/Mqtt.cpp)
-    list(APPEND EBLi_SRCS config/ConfigManager.cpp)
+    list(APPEND EBLi_SRCS config/ConfigManager.cpp config/ConfigProperty.cpp config/ConfigPropertyConstraint.cpp config/ConfigPropertyConstraintNumber.cpp config/ConfigPropertyConstraintString.cpp)
     list(APPEND EBLi_PUBLIC_INCLUDE_DIRS config/public)
     #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} wifi_provisioning)
     #    list(APPEND EBLi_DEPENDENCIES mqtt)

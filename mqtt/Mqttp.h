@@ -10,6 +10,9 @@ namespace EBLi
 {
 
 class MqttPublisher;
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+class ConfigProperty;
+#endif
 
 class Mqttp
 {
@@ -42,6 +45,15 @@ private:
     std::vector<MqttSubscriber*> m_subscribers;
     void setupAllSubscriptions();
     void setupOneSubscription(MqttSubscriber *subscriber);
+
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    struct Config {
+        static void init();
+        static ConfigProperty *broker();
+        static ConfigProperty *deviceTopic();
+        static ConfigProperty *groupTopic();
+    };
+#endif
 };
 
 }

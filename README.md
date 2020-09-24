@@ -7,7 +7,7 @@
 **Publish**
 ```c++
 auto mqtt = EBLi::Mqtt::instance();
-myPublisher = mqtt->createPublisher("my_property");
+auto myPublisher = mqtt->createPublisher("my_property");
 myPublisher->publishValue("the value of my property");
 ```
 
@@ -19,3 +19,25 @@ mqtt->createSubscriber("my_property", [](const std::string &value) {
     std::cout << "new value reads: '" << value << "'" << std::endl;
 });
 ```
+
+# NOTES
+
+- ~~wifi provisioning~~
+- config manager
+  - WebConfig
+- expose config over mqtt
+- ~~common MQTT~~
+- common REST
+- OTA
+
+targets i have in mind
+- LedWall
+- OneWheel Monitor
+- Flowers
+
+---
+
+
+## TODO 
+
+- ~~move public includes to separate folder(s) and mark them es exported (CMakeLists)~~

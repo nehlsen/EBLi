@@ -1,5 +1,6 @@
-#include <esp_log.h>
 #include "ConfigManager.h"
+#include <algorithm>
+#include <esp_log.h>
 
 namespace EBLi {
 
@@ -78,6 +79,41 @@ void ConfigManager::close()
 
     nvs_close(m_nvsHandle);
     m_isOpen = false;
+}
+
+ConfigProperty * ConfigManager::property(const std::string &shortKey, const std::string &longKey)
+{
+    auto property = getProperty(shortKey);
+    if (nullptr == property) {
+        property = createProperty(shortKey, longKey);
+    }
+
+    return property;
+}
+
+ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const std::string &longKey)
+{
+    auto property = getProperty(shortKey);
+    if (nullptr != property) {
+        return property;
+    }
+
+    property = new ConfigProperty(shortKey, longKey.length() < 1 ? shortKey : longKey);
+    m_properties.push_back(property);
+    return property;
+}
+
+ConfigProperty * ConfigManager::getProperty(const std::string &shortKey)
+{
+    auto it = std::find_if(m_properties.begin(), m_properties.end(), [shortKey](const ConfigProperty *property) {
+        return property->getShortKey() == shortKey;
+    });
+
+    if (it != m_properties.end()) {
+        return *it;
+    }
+
+    return nullptr;
 }
 
 void ConfigManager::setAutoCommitEnabled(bool enabled)

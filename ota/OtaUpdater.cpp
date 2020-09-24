@@ -31,6 +31,8 @@ OtaUpdater::OtaUpdater():
 {
     esp_log_level_set("esp_https_ota", ESP_LOG_DEBUG); // log download progress
 
+    // FIXME start on_got_ip
+
     ota_updater_event_group = xEventGroupCreate();
     xTaskCreate(
             &ota_updater_task,
