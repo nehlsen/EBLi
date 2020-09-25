@@ -6,6 +6,8 @@
 #include <vector>
 #include "ConfigProperty.h"
 
+class cJSON;
+
 namespace EBLi {
 
 class ConfigManager
@@ -29,6 +31,7 @@ public:
 //    template<typename T> ConfigProperty<T> *createConfig(const std::string &key);
     ConfigProperty *property(const std::string &shortKey, const std::string &longKey = std::string());
 
+    // TODO remove, just always auto-commit
     void setAutoCommitEnabled(bool enabled = true);
     bool isAutoCommitEnabled() const;
 
@@ -39,6 +42,9 @@ public:
     bool setValue(const std::string &key, const std::string &value);
 
     int32_t getRestartCounter();
+
+    cJSON *toJson();
+    bool fromJson(cJSON *configObject);
 
 private:
     ConfigManager() = default;

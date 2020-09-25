@@ -1,20 +1,19 @@
 #include "ConfigProperty.h"
+#include "ConfigPropertyConstraint.h"
+#include "ConfigManager.h"
 #include <cassert>
 #include <utility>
+#include <cJSON.h>
+#include <esp_log.h>
 
 namespace EBLi
 {
-
-ConfigProperty::ConfigProperty(const std::string &shortKey):
-    ConfigProperty(shortKey, shortKey)
-{}
 
 ConfigProperty::ConfigProperty(std::string shortKey, std::string longKey):
     m_shortKey(std::move(shortKey)), m_longKey(std::move(longKey))
 {
     assert(m_shortKey.length() > 0);
     assert(m_shortKey.length() < 16);
-    assert(m_longKey.length() > 0);
 }
 
 std::string ConfigProperty::getShortKey() const
@@ -24,17 +23,27 @@ std::string ConfigProperty::getShortKey() const
 
 std::string ConfigProperty::getLongKey() const
 {
-    return m_longKey;
+    return m_longKey.length() < 1 ? m_shortKey : m_longKey;
 }
 
-ConfigProperty * ConfigProperty::setDefaultValue(const int &defaultValue)
+ConfigProperty *ConfigProperty::setDefaultValue(const int &defaultValue)
 {
+    if (m_type != TYPE_UNKNOWN && m_type != TYPE_INT) {
+        ESP_LOGW("ConfigProperty", "setDefaultValue: operation changes type hint!");
+    }
+    m_type = TYPE_INT;
+
     m_defaultValueInt = defaultValue;
     return this;
 }
 
-ConfigProperty * ConfigProperty::setDefaultValue(const std::string &defaultValue)
+ConfigProperty *ConfigProperty::setDefaultValue(const std::string &defaultValue)
 {
+    if (m_type != TYPE_UNKNOWN && m_type != TYPE_STRING) {
+        ESP_LOGW("ConfigProperty", "setDefaultValue: operation changes type hint!");
+    }
+    m_type = TYPE_STRING;
+
     m_defaultValueString = defaultValue;
     return this;
 }
@@ -59,24 +68,58 @@ T ConfigProperty::getDefaultValue() const
 
 void ConfigProperty::setValue(const int &value)
 {
-    m_valueInt = value;
+    if (m_type != TYPE_UNKNOWN && m_type != TYPE_INT) {
+        ESP_LOGW("ConfigProperty", "setValue: operation changes type hint!");
+    }
+    m_type = TYPE_INT;
+
+    if (nullptr != m_constraint) {
+        ConfigManager::instance()->setValue(getShortKey(), m_constraint->constrain(value));
+    } else {
+        ConfigManager::instance()->setValue(getShortKey(), value);
+    }
+
+    if (m_changeHandler) {
+        m_changeHandler(this);
+    }
 }
 
 void ConfigProperty::setValue(const std::string &value)
 {
-    m_valueString = value;
+    if (m_type != TYPE_UNKNOWN && m_type != TYPE_STRING) {
+        ESP_LOGW("ConfigProperty", "setDefaultValue: operation changes type hint!");
+    }
+    m_type = TYPE_STRING;
+
+    if (nullptr != m_constraint) {
+        ConfigManager::instance()->setValue(getShortKey(), m_constraint->constrain(value));
+    } else {
+        ConfigManager::instance()->setValue(getShortKey(), value);
+    }
+
+    if (m_changeHandler) {
+        m_changeHandler(this);
+    }
 }
 
 template<>
 int ConfigProperty::getValue() const
 {
-    return m_valueInt;
+    auto value = ConfigManager::instance()->getValue(getShortKey(), getDefaultValue<int>());
+//    if (nullptr != m_constraint) {
+//        return m_constraint->constrain(value);
+//    }
+    return value;
 }
 
 template<>
 std::string ConfigProperty::getValue() const
 {
-    return m_valueString;
+    auto value = ConfigManager::instance()->getValue(getShortKey(), getDefaultValue<std::string>());
+//    if (nullptr != m_constraint) {
+//        return m_constraint->constrain(value);
+//    }
+    return value;
 }
 
 template<typename T>
@@ -95,6 +138,35 @@ ConfigProperty *ConfigProperty::setChangeHandler(ChangeHandlerCallback cb)
 {
     m_changeHandler = cb;
     return this;
+}
+
+void ConfigProperty::toJson(cJSON *configObject)
+{
+    assert(configObject != nullptr);
+
+    if (m_type == TYPE_STRING) {
+        cJSON_AddStringToObject(configObject, getLongKey().c_str(), getValue<std::string>().c_str());
+    } else if (m_type == TYPE_INT) {
+        cJSON_AddNumberToObject(configObject, getLongKey().c_str(), getValue<int>());
+    } else {
+        ESP_LOGW("ConfigProperty", "toJson: uncertain type!");
+    }
+}
+
+bool ConfigProperty::fromJson(cJSON *const propertyObject)
+{
+    assert(propertyObject != nullptr);
+
+    if (m_type == TYPE_STRING && cJSON_IsString(propertyObject)) {
+        setValue(propertyObject->valuestring);
+        return true;
+    } else if (m_type == TYPE_INT && cJSON_IsNumber(propertyObject)) {
+        setValue(propertyObject->valueint);
+        return true;
+    } else {
+        ESP_LOGW("ConfigProperty", "toJson: uncertain type!");
+        return false;
+    }
 }
 
 }

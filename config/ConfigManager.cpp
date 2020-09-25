@@ -1,6 +1,7 @@
 #include "ConfigManager.h"
 #include <algorithm>
 #include <esp_log.h>
+#include <cJSON.h>
 
 namespace EBLi {
 
@@ -98,7 +99,12 @@ ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const
         return property;
     }
 
-    property = new ConfigProperty(shortKey, longKey.length() < 1 ? shortKey : longKey);
+//#if defined(CONFIG_ENABLE_EBLI_MQTT)
+//    property = new ConfigPropertyMqtt(shortKey, longKey);
+//#else
+    property = new ConfigProperty(shortKey, longKey);
+//#endif
+
     m_properties.push_back(property);
     return property;
 }
@@ -153,9 +159,9 @@ int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) co
 
     int32_t value = defaultValue;
     esp_err_t err = nvs_get_i32(m_nvsHandle, key.c_str(), &value);
-
     if (err != ESP_OK) {
-        ESP_LOGW(LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
+        ESP_LOGW(LOG_TAG, "NVS read Error (%s), key:\"%s\", fallback to %d", esp_err_to_name(err), key.c_str(), defaultValue);
+        return defaultValue;
     }
     
     return value;
@@ -244,6 +250,31 @@ int32_t ConfigManager::getRestartCounter()
     }
     
     return m_restartCounter;
+}
+
+cJSON *ConfigManager::toJson()
+{
+    cJSON *configObject = cJSON_CreateObject();
+
+    for (auto property : m_properties) {
+        property->toJson(configObject);
+    }
+
+    return configObject;
+}
+
+bool ConfigManager::fromJson(cJSON *configObject)
+{
+    bool atLeastOneValueChanged = false;
+
+    for (auto property : m_properties) {
+        cJSON *const propertyObject = cJSON_GetObjectItem(configObject, property->getLongKey().c_str());
+        if (propertyObject) {
+            atLeastOneValueChanged |= property->fromJson(propertyObject);
+        }
+    }
+
+    return atLeastOneValueChanged;
 }
 
 bool ConfigManager::isKeyValid(const std::string &key)
