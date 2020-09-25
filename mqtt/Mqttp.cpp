@@ -4,7 +4,7 @@
 #include <MqttPublisher.h>
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
 #include <ConfigManager.h>
-#include <ConfigPropertyConstraintString.h>
+#include <ConfigPropertyConstraint.h>
 #endif
 
 namespace EBLi
@@ -54,6 +54,7 @@ Mqttp::Mqttp()
     esp_mqtt_client_config_t mqtt_cfg = {
             .uri = broker.c_str(),
     };
+    ESP_LOGI(LOG_TAG, "Using Broker \"%s\"", broker.c_str());
 
     m_client = esp_mqtt_client_init(&mqtt_cfg);
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_got_ip, this);
@@ -240,18 +241,18 @@ void Mqttp::Config::init()
 ConfigProperty *Mqttp::Config::broker()
 {
     return EBLi::ConfigManager::instance()
-        ->property("mqtt_broker")
-        ->setConstraint(new EBLi::ConfigPropertyConstraintString(1, 64));
+        ->property("mqtt_broker", "MqttBroker")
+        ->setConstraint(EBLi::ConfigPropertyConstraint::StringLength(64));
 }
 
 ConfigProperty *Mqttp::Config::deviceTopic()
 {
-    return EBLi::ConfigManager::instance()->property("mqtt_tpc_device");
+    return EBLi::ConfigManager::instance()->property("mqtt_tpc_device", "MqttDeviceTopic");
 }
 
 ConfigProperty *Mqttp::Config::groupTopic()
 {
-    return EBLi::ConfigManager::instance()->property("mqtt_tpc_group");
+    return EBLi::ConfigManager::instance()->property("mqtt_tpc_group", "MqttGroupTopic");
 }
 #endif
 
