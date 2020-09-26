@@ -14,10 +14,9 @@ class ConfigPropertyConstraint;
 class ConfigProperty
 {
 friend class ConfigManager;
+friend class MqttBridge;
 
 public:
-//    static ConfigProperty *create(ConfigManager *configManager, std::string shortKey, std::string longKey = std::string());
-
     std::string getShortKey() const;
     std::string getLongKey() const;
 
@@ -37,9 +36,6 @@ public:
     typedef std::function<void(ConfigProperty *property)> ChangeHandlerCallback;
     ConfigProperty *setChangeHandler(ChangeHandlerCallback cb);
 
-    // FIXME use events instead of callbacks! would solve MQTT callback problem!
-//    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_CHANGED, (void*)&property, sizeof(void), portMAX_DELAY);
-
 private:
     ConfigProperty(std::string shortKey, std::string longKey);
 
@@ -57,7 +53,7 @@ private:
     ConfigPropertyConstraint *m_constraint = nullptr;
     ChangeHandlerCallback m_changeHandler;
 
-    void toJson(cJSON *configObject);
+    void toJson(cJSON *configObject) const;
     bool fromJson(cJSON *const propertyObject);
 };
 

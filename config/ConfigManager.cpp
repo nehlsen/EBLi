@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <esp_log.h>
 #include <cJSON.h>
+#include <ebli_events.h>
 
 namespace EBLi {
 
@@ -99,13 +100,11 @@ ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const
         return property;
     }
 
-//#if defined(CONFIG_ENABLE_EBLI_MQTT)
-//    property = new ConfigPropertyMqtt(shortKey, longKey);
-//#else
     property = new ConfigProperty(shortKey, longKey);
-//#endif
-
     m_properties.push_back(property);
+
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_REGISTERED, (void*)property, sizeof(ConfigProperty), portMAX_DELAY);
+
     return property;
 }
 

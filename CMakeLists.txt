@@ -40,6 +40,9 @@ if(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
     list(APPEND EBLi_PUBLIC_INCLUDE_DIRS config/public)
     #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} wifi_provisioning)
     #    list(APPEND EBLi_DEPENDENCIES mqtt)
+    if(CONFIG_ENABLE_EBLI_MQTT)
+        list(APPEND EBLi_SRCS config/MqttBridge.cpp)
+    endif()
 endif()
 
 idf_component_register(

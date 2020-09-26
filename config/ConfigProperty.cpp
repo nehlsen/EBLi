@@ -5,6 +5,7 @@
 #include <utility>
 #include <cJSON.h>
 #include <esp_log.h>
+#include "ebli_events.h"
 
 namespace EBLi
 {
@@ -82,6 +83,8 @@ void ConfigProperty::setValue(const int &value)
     if (m_changeHandler) {
         m_changeHandler(this);
     }
+
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_CHANGED, (void*)this, sizeof(ConfigProperty), portMAX_DELAY);
 }
 
 void ConfigProperty::setValue(const std::string &value)
@@ -100,26 +103,20 @@ void ConfigProperty::setValue(const std::string &value)
     if (m_changeHandler) {
         m_changeHandler(this);
     }
+
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_CHANGED, (void*)this, sizeof(ConfigProperty), portMAX_DELAY);
 }
 
 template<>
 int ConfigProperty::getValue() const
 {
-    auto value = ConfigManager::instance()->getValue(getShortKey(), getDefaultValue<int>());
-//    if (nullptr != m_constraint) {
-//        return m_constraint->constrain(value);
-//    }
-    return value;
+    return ConfigManager::instance()->getValue(getShortKey(), getDefaultValue<int>());
 }
 
 template<>
 std::string ConfigProperty::getValue() const
 {
-    auto value = ConfigManager::instance()->getValue(getShortKey(), getDefaultValue<std::string>());
-//    if (nullptr != m_constraint) {
-//        return m_constraint->constrain(value);
-//    }
-    return value;
+    return ConfigManager::instance()->getValue(getShortKey(), getDefaultValue<std::string>());
 }
 
 template<typename T>
@@ -140,7 +137,7 @@ ConfigProperty *ConfigProperty::setChangeHandler(ChangeHandlerCallback cb)
     return this;
 }
 
-void ConfigProperty::toJson(cJSON *configObject)
+void ConfigProperty::toJson(cJSON *configObject) const
 {
     assert(configObject != nullptr);
 
