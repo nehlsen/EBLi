@@ -2,13 +2,15 @@
 #include "OtaUpdaterPrivate.h"
 #include <freertos/event_groups.h>
 #include <esp_log.h>
+#include <tcpip_adapter.h>
+#include <esp_event.h>
 
 namespace EBLi {
 
 static const char *UPDATER_LOG_TAG = "EBLi:OtaUpdater";
 
 #define UPDATER_RUNNING_BIT BIT1
-static EventGroupHandle_t ota_updater_event_group;
+static EventGroupHandle_t ota_updater_event_group = nullptr;
 
 [[noreturn]] void ota_updater_task(void *pvParameter)
 {
@@ -24,6 +26,27 @@ static EventGroupHandle_t ota_updater_event_group;
     }
 }
 
+static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    if (nullptr != ota_updater_event_group) {
+        return;
+    }
+    auto updater = static_cast<OtaUpdaterPrivate*>(event_handler_arg);
+    if (nullptr == updater) {
+        return;
+    }
+
+    ota_updater_event_group = xEventGroupCreate();
+    xTaskCreate(
+            &ota_updater_task,
+            "ota_updater_task",
+            4000,
+            updater,
+            1,
+            nullptr
+    );
+}
+
 /**********************************************************************************************************************/
 
 OtaUpdater::OtaUpdater():
@@ -31,17 +54,7 @@ OtaUpdater::OtaUpdater():
 {
     esp_log_level_set("esp_https_ota", ESP_LOG_DEBUG); // log download progress
 
-    // FIXME start on_got_ip
-
-    ota_updater_event_group = xEventGroupCreate();
-    xTaskCreate(
-            &ota_updater_task,
-            "ota_updater_task",
-            4000,
-            m_updater,
-            1,
-            nullptr
-    );
+    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_got_ip, m_updater);
 }
 
 void OtaUpdater::setUpdateUrl(const char *url)
