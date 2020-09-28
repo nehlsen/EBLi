@@ -34,8 +34,14 @@ menu "EBLi Configuration"
         depends on ENABLE_EBLI_MQTT
         default "ebli-device-group"
 
-    config ENABLE_EBLI_CONFIG_OTA
+    config ENABLE_EBLI_TIME
+        bool "Enable Time (Timezone config and NTP Time sync)"
+        depends on ENABLE_EBLI_WIFI
+        default false
+
+    config ENABLE_EBLI_OTA
         bool "Enable OTA"
+        depends on ENABLE_EBLI_WIFI
         default false
 
     config ENABLE_EBLI_CONFIG_MANAGER

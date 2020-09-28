@@ -20,6 +20,10 @@
 #endif
 #endif
 
+#if defined(CONFIG_ENABLE_EBLI_TIME)
+#include <Time.h>
+#endif
+
 #include <esp_event_base.h>
 ESP_EVENT_DEFINE_BASE(EBLI_EVENTS);
 
@@ -44,6 +48,10 @@ void init_all()
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
     EBLi::MqttBridge::setup();
 #endif
+#endif
+
+#if defined(CONFIG_ENABLE_EBLI_TIME)
+    EBLi::Time::init();
 #endif
 }
 
