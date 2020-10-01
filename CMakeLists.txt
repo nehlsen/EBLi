@@ -7,6 +7,14 @@ if(CONFIG_ENABLE_EBLI_FS)
 #    list(APPEND EBLi_PUBLIC_INCLUDE_DIRS fs/public)
 #    set(EBLi_DEPENDENCIES ${EBLi_DEPENDENCIES} spiffs nvs_flash)
     list(APPEND EBLi_DEPENDENCIES spiffs nvs_flash)
+
+    if(DATA_DIR)
+        spiffs_create_partition_image(data ${DATA_DIR} FLASH_IN_PROJECT)
+    else()
+        set(NO_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fs/nodata)
+        message("++ EBLi: Do Data dir configured. using '${NO_DATA_DIR}' as substitute" )
+        spiffs_create_partition_image(data ${NO_DATA_DIR} FLASH_IN_PROJECT)
+    endif()
 endif()
 
 if(CONFIG_ENABLE_EBLI_WIFI)
@@ -54,6 +62,3 @@ idf_component_register(
         PRIV_REQUIRES spiffs nvs_flash wifi_provisioning mqtt esp_https_ota app_update json
 #        PRIV_REQUIRES ${EBLi_DEPENDENCIES} # FIXME
 )
-
-# if FS
-# spiffs_create_partition_image(data ${DATA_DIR} FLASH_IN_PROJECT)
