@@ -49,4 +49,23 @@ menu "EBLi Configuration"
         depends on ENABLE_EBLI_FS
         default false
 
+    config EBLI_SENSORS_ENABLED
+        bool "Enable the sensors sub-component"
+        depends on ENABLE_EBLI_MQTT
+        default false
+
+    config EBLI_SENSORS_PUBLISH_DELAY
+        int "delay between each sensor read and publish"
+        depends on EBLI_SENSORS_ENABLED
+        default 15000
+
+    config EBLI_SENSORS_AHT10_ENABLED
+        bool "Enable AHT10 sensor"
+        depends on EBLI_SENSORS_ENABLED
+        default false
+
+    config EBLI_DEBUG
+        bool "Set all Log-Levels to maximum"
+        default false
+
 endmenu

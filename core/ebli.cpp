@@ -25,6 +25,10 @@
 #include <Time.h>
 #endif
 
+#if defined(CONFIG_EBLI_SENSORS_ENABLED)
+#include <Sensors.h>
+#endif
+
 #include <esp_event_base.h>
 ESP_EVENT_DEFINE_BASE(EBLI_EVENTS);
 
@@ -63,6 +67,10 @@ void init_all()
 
 #if defined(CONFIG_ENABLE_EBLI_TIME)
     EBLi::Time::init();
+#endif
+
+#if defined(CONFIG_EBLI_SENSORS_ENABLED)
+    EBLi::Sensors::Sensors::init();
 #endif
 }
 

@@ -243,7 +243,7 @@ void Mqttp::setupOneSubscription(MqttSubscriber *subscriber)
         ESP_LOGE(LOG_TAG_MQTT, "Failed to subscribe to \"%s\"", deviceTopic.c_str());
         subscriber->setDeviceTopic("");
     } else {
-        ESP_LOGD(LOG_TAG_MQTT, "Subscribed to \"%s\"", deviceTopic.c_str());
+        ESP_LOGI(LOG_TAG_MQTT, "Subscribed to \"%s\"", deviceTopic.c_str());
         subscriber->setDeviceTopic(deviceTopic);
     }
 
@@ -252,7 +252,7 @@ void Mqttp::setupOneSubscription(MqttSubscriber *subscriber)
         ESP_LOGE(LOG_TAG_MQTT, "Failed to subscribe to \"%s\"", groupTopic.c_str());
         subscriber->setGroupTopic("");
     } else {
-        ESP_LOGD(LOG_TAG_MQTT, "Subscribed to \"%s\"", groupTopic.c_str());
+        ESP_LOGI(LOG_TAG_MQTT, "Subscribed to \"%s\"", groupTopic.c_str());
         subscriber->setGroupTopic(groupTopic);
     }
 }
