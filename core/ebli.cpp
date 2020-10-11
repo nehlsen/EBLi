@@ -1,5 +1,6 @@
 #include "ebli.h"
 #include <sdkconfig.h>
+#include <ebli_log.h>
 
 #if defined(CONFIG_ENABLE_EBLI_FS)
 #include <FS.h>
@@ -31,6 +32,12 @@ namespace EBLi {
 
 void init_all()
 {
+#if defined(CONFIG_EBLI_DEBUG)
+    esp_log_level_set(LOG_TAG_CONFIG, ESP_LOG_VERBOSE);
+    esp_log_level_set(LOG_TAG_MQTT, ESP_LOG_VERBOSE);
+    esp_log_level_set(LOG_TAG_SENSORS, ESP_LOG_VERBOSE);
+#endif
+
 #if defined(CONFIG_ENABLE_EBLI_FS)
     ESP_ERROR_CHECK(EBLi::FS::init());
 #endif

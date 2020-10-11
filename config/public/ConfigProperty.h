@@ -7,14 +7,14 @@
 class cJSON;
 
 namespace EBLi {
-
+namespace Config { class MqttBridge; }
 class ConfigManager;
 class ConfigPropertyConstraint;
 
 class ConfigProperty
 {
 friend class ConfigManager;
-friend class MqttBridge;
+friend class Config::MqttBridge;
 
 public:
     std::string getShortKey() const;
@@ -34,6 +34,7 @@ public:
     // new value? bool: change handler may deny new value?
 //    typedef std::function<bool(ConfigProperty *property)> ChangeHandlerCallback;
     typedef std::function<void(ConfigProperty *property)> ChangeHandlerCallback;
+    [[deprecated("use events instead")]]
     ConfigProperty *setChangeHandler(ChangeHandlerCallback cb);
 
 private:

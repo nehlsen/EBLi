@@ -4,8 +4,8 @@
 #include <cassert>
 #include <utility>
 #include <cJSON.h>
-#include <esp_log.h>
-#include "ebli_events.h"
+#include <ebli_log.h>
+#include <ebli_events.h>
 
 namespace EBLi
 {
@@ -30,7 +30,7 @@ std::string ConfigProperty::getLongKey() const
 ConfigProperty *ConfigProperty::setDefaultValue(const int &defaultValue)
 {
     if (m_type != TYPE_UNKNOWN && m_type != TYPE_INT) {
-        ESP_LOGW("ConfigProperty", "setDefaultValue: operation changes type hint!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "setDefaultValue: operation changes type hint!");
     }
     m_type = TYPE_INT;
 
@@ -41,7 +41,7 @@ ConfigProperty *ConfigProperty::setDefaultValue(const int &defaultValue)
 ConfigProperty *ConfigProperty::setDefaultValue(const std::string &defaultValue)
 {
     if (m_type != TYPE_UNKNOWN && m_type != TYPE_STRING) {
-        ESP_LOGW("ConfigProperty", "setDefaultValue: operation changes type hint!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "setDefaultValue: operation changes type hint!");
     }
     m_type = TYPE_STRING;
 
@@ -70,7 +70,7 @@ T ConfigProperty::getDefaultValue() const
 void ConfigProperty::setValue(const int &value)
 {
     if (m_type != TYPE_UNKNOWN && m_type != TYPE_INT) {
-        ESP_LOGW("ConfigProperty", "setValue: operation changes type hint!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "setValue: operation changes type hint!");
     }
     m_type = TYPE_INT;
 
@@ -90,7 +90,7 @@ void ConfigProperty::setValue(const int &value)
 void ConfigProperty::setValue(const std::string &value)
 {
     if (m_type != TYPE_UNKNOWN && m_type != TYPE_STRING) {
-        ESP_LOGW("ConfigProperty", "setDefaultValue: operation changes type hint!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "setDefaultValue: operation changes type hint!");
     }
     m_type = TYPE_STRING;
 
@@ -146,7 +146,7 @@ void ConfigProperty::toJson(cJSON *configObject) const
     } else if (m_type == TYPE_INT) {
         cJSON_AddNumberToObject(configObject, getLongKey().c_str(), getValue<int>());
     } else {
-        ESP_LOGW("ConfigProperty", "toJson: uncertain type!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "toJson: uncertain type!");
     }
 }
 
@@ -161,7 +161,7 @@ bool ConfigProperty::fromJson(cJSON *const propertyObject)
         setValue(propertyObject->valueint);
         return true;
     } else {
-        ESP_LOGW("ConfigProperty", "toJson: uncertain type!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "toJson: uncertain type!");
         return false;
     }
 }

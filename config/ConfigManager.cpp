@@ -1,12 +1,10 @@
 #include "ConfigManager.h"
+#include <ebli_log.h>
 #include <algorithm>
-#include <esp_log.h>
 #include <cJSON.h>
 #include <ebli_events.h>
 
 namespace EBLi {
-
-static const char *LOG_TAG = "EBLi:ConfigManager";
 
 #define NVS_NAMESPACE "ebli_config"
 // NOTE keys are limited to 15 characters
@@ -58,7 +56,7 @@ bool ConfigManager::openNvs()
 {
     esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &m_nvsHandle);
     if (err != ESP_OK) {
-        ESP_LOGE(LOG_TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+        ESP_LOGE(LOG_TAG_CONFIG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
         return false;
     }
 
@@ -69,7 +67,7 @@ void ConfigManager::logNvsState()
 {
     nvs_stats_t nvs_stats;
     nvs_get_stats(nullptr, &nvs_stats);
-    ESP_LOGI(LOG_TAG, "NVS: UsedEntries = (%d), FreeEntries = (%d), AllEntries = (%d)",
+    ESP_LOGI(LOG_TAG_CONFIG, "NVS: UsedEntries = (%d), FreeEntries = (%d), AllEntries = (%d)",
              nvs_stats.used_entries, nvs_stats.free_entries, nvs_stats.total_entries);
 }
 
@@ -95,6 +93,8 @@ ConfigProperty * ConfigManager::property(const std::string &shortKey, const std:
 
 ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const std::string &longKey)
 {
+    ESP_LOGV(LOG_TAG_CONFIG, "createProperty('%s')", shortKey.c_str());
+
     auto property = getProperty(shortKey);
     if (nullptr != property) {
         return property;
@@ -110,13 +110,19 @@ ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const
 
 ConfigProperty * ConfigManager::getProperty(const std::string &shortKey)
 {
+    ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s')", shortKey.c_str());
+
     auto it = std::find_if(m_properties.begin(), m_properties.end(), [shortKey](const ConfigProperty *property) {
+//        ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s') =? '%s'", shortKey.c_str(), property->getShortKey().c_str());
         return property->getShortKey() == shortKey;
     });
 
     if (it != m_properties.end()) {
+//        ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s') == '%s'", shortKey.c_str(), (*it)->getShortKey().c_str());
         return *it;
     }
+
+    ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s') not found", shortKey.c_str());
 
     return nullptr;
 }
@@ -140,7 +146,7 @@ bool ConfigManager::commit()
     esp_err_t err = nvs_commit(m_nvsHandle);
     
     if (err != ESP_OK) {
-        ESP_LOGE(LOG_TAG, "Error (%s) committing NVS Data!", esp_err_to_name(err));
+        ESP_LOGE(LOG_TAG_CONFIG, "Error (%s) committing NVS Data!", esp_err_to_name(err));
         return false;
     }
 
@@ -159,7 +165,7 @@ int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) co
     int32_t value = defaultValue;
     esp_err_t err = nvs_get_i32(m_nvsHandle, key.c_str(), &value);
     if (err != ESP_OK) {
-        ESP_LOGW(LOG_TAG, "NVS read Error (%s), key:\"%s\", fallback to %d", esp_err_to_name(err), key.c_str(), defaultValue);
+        ESP_LOGW(LOG_TAG_CONFIG, "NVS read Error (%s), key:\"%s\", fallback to %d", esp_err_to_name(err), key.c_str(), defaultValue);
         return defaultValue;
     }
     
@@ -168,6 +174,8 @@ int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) co
 
 bool ConfigManager::setValue(const std::string &key, int32_t value)
 {
+    ESP_LOGV(LOG_TAG_CONFIG, "setValue('%s')", key.c_str());
+
     if (!isOpen()) {
         return false;
     }
@@ -178,7 +186,7 @@ bool ConfigManager::setValue(const std::string &key, int32_t value)
     esp_err_t err = nvs_set_i32(m_nvsHandle, key.c_str(), value);
 
     if (err != ESP_OK) {
-        ESP_LOGE(LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
+        ESP_LOGE(LOG_TAG_CONFIG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
         return false;
     }
 
@@ -194,24 +202,24 @@ std::string ConfigManager::getValue(const std::string &key, const std::string &d
         return defaultValue;
     }
     if (defaultValue.length() > MAXIMUM_CONFIG_VALUE_LENGTH) {
-        ESP_LOGW(LOG_TAG, "Default value for \"%s\" is too long", key.c_str());
+        ESP_LOGW(LOG_TAG_CONFIG, "Default value for \"%s\" is too long", key.c_str());
     }
 
     size_t required_size;
     esp_err_t err = nvs_get_str(m_nvsHandle, key.c_str(), nullptr, &required_size);
     if (err != ESP_OK) {
-        ESP_LOGW(LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
+        ESP_LOGW(LOG_TAG_CONFIG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
         return defaultValue;
     }
     if (required_size >= 64) {
-        ESP_LOGW(LOG_TAG, "NVS read failed - max size exceeded, key:\"%s\"", key.c_str());
+        ESP_LOGW(LOG_TAG_CONFIG, "NVS read failed - max size exceeded, key:\"%s\"", key.c_str());
         return defaultValue;
     }
 
     char* value = (char*)malloc(required_size);
     err = nvs_get_str(m_nvsHandle, key.c_str(), value, &required_size);
     if (err != ESP_OK) {
-        ESP_LOGW(LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
+        ESP_LOGW(LOG_TAG_CONFIG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
         return defaultValue;
     }
 
@@ -222,6 +230,8 @@ std::string ConfigManager::getValue(const std::string &key, const std::string &d
 
 bool ConfigManager::setValue(const std::string &key, const std::string &value)
 {
+    ESP_LOGV(LOG_TAG_CONFIG, "setValue('%s')", key.c_str());
+
     if (!isOpen()) {
         return false;
     }
@@ -229,13 +239,13 @@ bool ConfigManager::setValue(const std::string &key, const std::string &value)
         return false;
     }
     if (value.length() > MAXIMUM_CONFIG_VALUE_LENGTH) {
-        ESP_LOGW(LOG_TAG, "Config value for \"%s\" is too long", key.c_str());
+        ESP_LOGW(LOG_TAG_CONFIG, "Config value for \"%s\" is too long", key.c_str());
         return false;
     }
 
     esp_err_t err = nvs_set_str(m_nvsHandle, key.c_str(), value.c_str());
     if (err != ESP_OK) {
-        ESP_LOGE(LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
+        ESP_LOGE(LOG_TAG_CONFIG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key.c_str());
         return false;
     }
 
@@ -287,7 +297,7 @@ bool ConfigManager::checkKeyAndLog(const std::string &key)
         return true;
     }
 
-    ESP_LOGW(LOG_TAG, "Config key \"%s\" is too long", key.c_str());
+    ESP_LOGW(LOG_TAG_CONFIG, "Config key \"%s\" is too long", key.c_str());
     return false;
 }
 
@@ -309,7 +319,7 @@ void ConfigManager::updateRestartCounter()
 
     int32_t newCount = getRestartCounter() + 1;
     if (setValue(RESTART_COUNTER_KEY, newCount)) {
-        ESP_LOGI(LOG_TAG, "Restart counter updated to %d", newCount);
+        ESP_LOGI(LOG_TAG_CONFIG, "Restart counter updated to %d", newCount);
         m_restartCounter = newCount;
     }
 }

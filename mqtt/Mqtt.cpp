@@ -1,8 +1,7 @@
 #include "Mqtt.h"
 #include "Mqttp.h"
 
-namespace EBLi
-{
+namespace EBLi {
 
 Mqtt *Mqtt::s_instance = nullptr;
 

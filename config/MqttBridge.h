@@ -1,10 +1,9 @@
-#ifndef LEDWALL_MQTTBRIDGE_H
-#define LEDWALL_MQTTBRIDGE_H
+#ifndef EBLI_CONFIG_MQTTBRIDGE_H
+#define EBLI_CONFIG_MQTTBRIDGE_H
 
-namespace EBLi
-{
-
+namespace EBLi {
 class ConfigProperty;
+namespace Config {
 
 class MqttBridge
 {
@@ -19,4 +18,6 @@ private:
 };
 
 }
-#endif //LEDWALL_MQTTBRIDGE_H
+}
+
+#endif //EBLI_CONFIG_MQTTBRIDGE_H

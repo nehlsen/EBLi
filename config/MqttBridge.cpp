@@ -3,12 +3,10 @@
 #include <Mqtt.h>
 #include <MqttPublisher.h>
 #include "ConfigProperty.h"
-#include <esp_log.h>
+#include <ebli_log.h>
 
-namespace EBLi
-{
+namespace EBLi::Config {
 
-#define LOG_TAG "MqttBridge"
 #define MQTT_PROPERTY_PREFIX "config/"
 
 static void onConfigPropertyEvent(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -42,12 +40,13 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
 
     auto mqtt = Mqtt::instance();
     mqtt->createSubscriber(createTopic(configProperty), [configProperty](const std::string &value) {
+//        ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Change callback for '%s' triggered", configProperty->getShortKey().c_str());
         if (configProperty->m_type == ConfigProperty::TYPE_INT) {
             configProperty->setValue(std::stoi(value));
         } else if (configProperty->m_type == ConfigProperty::TYPE_STRING) {
             configProperty->setValue(value);
         } else {
-            ESP_LOGW(LOG_TAG, "Can not update value for property '%s' - Type unknown", configProperty->getShortKey().c_str());
+            ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Can not update value for property '%s' - Type unknown", configProperty->getShortKey().c_str());
         }
     });
 
@@ -66,7 +65,7 @@ void MqttBridge::handleChanged(ConfigProperty *configProperty)
     } else if (configProperty->m_type == ConfigProperty::TYPE_STRING) {
         publisher->publishValue(configProperty->getValue<std::string>());
     } else {
-        ESP_LOGW(LOG_TAG, "Can not publish value for property '%s' - Type unknown", configProperty->getShortKey().c_str());
+        ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Can not publish value for property '%s' - Type unknown", configProperty->getShortKey().c_str());
     }
 
     delete publisher;

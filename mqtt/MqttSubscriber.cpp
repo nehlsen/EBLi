@@ -1,5 +1,4 @@
 #include "MqttSubscriber.h"
-
 #include <utility>
 
 namespace EBLi

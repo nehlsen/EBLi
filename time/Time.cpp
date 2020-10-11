@@ -1,5 +1,5 @@
 #include "Time.h"
-#include <esp_log.h>
+#include <ebli_log.h>
 #include <esp_event.h>
 #include <esp_sntp.h>
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
@@ -8,10 +8,7 @@
 
 #define DEFAULT_TIMEZONE "CET-1CEST,M3.5.0/2,M10.5.0/2"
 
-namespace EBLi
-{
-
-static const char *LOG_TAG = "EBLi:Time";
+namespace EBLi {
 
 bool Time::m_isInitialized = false;
 
@@ -25,7 +22,7 @@ static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int3
 esp_err_t Time::init()
 {
     if (m_isInitialized) {
-        ESP_LOGW(LOG_TAG, "already initialized...");
+        ESP_LOGW(LOG_TAG_TIME, "already initialized...");
         return ESP_OK;
         // maybe? e.g. esp_event_loop_create_default() does the same...
 //        return ESP_ERR_INVALID_STATE;
