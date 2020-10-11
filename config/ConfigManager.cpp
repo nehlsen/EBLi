@@ -93,12 +93,12 @@ ConfigProperty * ConfigManager::property(const std::string &shortKey, const std:
 
 ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const std::string &longKey)
 {
-    ESP_LOGV(LOG_TAG_CONFIG, "createProperty('%s')", shortKey.c_str());
-
     auto property = getProperty(shortKey);
     if (nullptr != property) {
         return property;
     }
+
+    ESP_LOGV(LOG_TAG_CONFIG, "createProperty('%s')", shortKey.c_str());
 
     property = new ConfigProperty(shortKey, longKey);
     m_properties.push_back(property);
@@ -110,15 +110,12 @@ ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const
 
 ConfigProperty * ConfigManager::getProperty(const std::string &shortKey)
 {
-    ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s')", shortKey.c_str());
-
     auto it = std::find_if(m_properties.begin(), m_properties.end(), [shortKey](const ConfigProperty *property) {
-//        ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s') =? '%s'", shortKey.c_str(), property->getShortKey().c_str());
         return property->getShortKey() == shortKey;
     });
 
     if (it != m_properties.end()) {
-//        ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s') == '%s'", shortKey.c_str(), (*it)->getShortKey().c_str());
+        ESP_LOGV(LOG_TAG_CONFIG, "getProperty('%s') found", shortKey.c_str());
         return *it;
     }
 
@@ -174,7 +171,7 @@ int32_t ConfigManager::getValue(const std::string &key, int32_t defaultValue) co
 
 bool ConfigManager::setValue(const std::string &key, int32_t value)
 {
-    ESP_LOGV(LOG_TAG_CONFIG, "setValue('%s')", key.c_str());
+    ESP_LOGD(LOG_TAG_CONFIG, "setValue('%s')", key.c_str());
 
     if (!isOpen()) {
         return false;
@@ -230,7 +227,7 @@ std::string ConfigManager::getValue(const std::string &key, const std::string &d
 
 bool ConfigManager::setValue(const std::string &key, const std::string &value)
 {
-    ESP_LOGV(LOG_TAG_CONFIG, "setValue('%s')", key.c_str());
+    ESP_LOGD(LOG_TAG_CONFIG, "setValue('%s')", key.c_str());
 
     if (!isOpen()) {
         return false;

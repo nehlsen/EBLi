@@ -217,11 +217,6 @@ void Mqttp::onMqttData(esp_mqtt_event_handle_t event)
     ESP_LOGD(LOG_TAG_MQTT, "onMqttData, topic: '%s'", topic.c_str());
 
     for (auto subscriber : m_subscribers) {
-        ESP_LOGV(LOG_TAG_MQTT, "onMqttData, subscriber: '%s' & '%s'",
-                 subscriber->getDeviceTopic().c_str(),
-                 subscriber->getGroupTopic().c_str()
-                 );
-
         if (subscriber->isMatchForTopic(topic)) {
             // TODO maybe forward the matched topic (for the subscriber to know whether it was group or device topic)
             subscriber->handleEventData(event->data, event->data_len);
