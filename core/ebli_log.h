@@ -10,6 +10,7 @@
 #define LOG_TAG_CONFIG_PROPERTY "EBLi:Config:Property"
 #define LOG_TAG_CONFIG_MQTT     "EBLi:Config:Mqtt"
 #define LOG_TAG_MQTT            "EBLi:Mqtt"
+#define LOG_TAG_MQTT_SUBSCRIBER "EBLi:Mqtt:Subscriber"
 #define LOG_TAG_SENSORS         "EBLi:Sensors"
 #define LOG_TAG_TIME            "EBLi:Time"
 // TODO add remaining sub-components

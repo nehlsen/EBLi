@@ -103,7 +103,7 @@ ConfigProperty *ConfigManager::createProperty(const std::string &shortKey, const
     property = new ConfigProperty(shortKey, longKey);
     m_properties.push_back(property);
 
-    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_REGISTERED, (void*)property, sizeof(ConfigProperty), portMAX_DELAY);
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_REGISTERED, (void*)&property, sizeof(ConfigProperty*), portMAX_DELAY);
 
     return property;
 }

@@ -31,7 +31,7 @@ private:
     std::string getGroupTopic() const;
     std::string m_groupTopic;
 
-    bool matchesTopic(const std::string &topic) const;
+    bool isMatchForTopic(const std::string &topic) const;
     void handleEventData(char *data, int data_len);
 };
 

@@ -14,7 +14,7 @@ static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int3
     auto mqtt = static_cast<Mqttp*>(event_handler_arg);
     ESP_ERROR_CHECK(nullptr == mqtt ? ESP_FAIL : ESP_OK);
 
-    mqtt->startMqttClient();
+    mqtt->initializeAndStartClient();
 }
 
 static void mqtt_event_connected(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
@@ -43,26 +43,22 @@ static void mqtt_event_data(void* event_handler_arg, esp_event_base_t event_base
 
 Mqttp::Mqttp()
 {
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    Config::init();
-#endif
-
-    const std::string broker = getBroker();
-    esp_mqtt_client_config_t mqtt_cfg = {
-            .uri = broker.c_str(),
-    };
-    ESP_LOGI(LOG_TAG, "Using Broker \"%s\"", broker.c_str());
-
-    m_client = esp_mqtt_client_init(&mqtt_cfg);
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_got_ip, this);
-    esp_mqtt_client_register_event(m_client, MQTT_EVENT_CONNECTED, mqtt_event_connected, this);
-    esp_mqtt_client_register_event(m_client, MQTT_EVENT_DISCONNECTED, mqtt_event_disconnected, this);
-    esp_mqtt_client_register_event(m_client, MQTT_EVENT_DATA, mqtt_event_data, this);
 }
 
 bool Mqttp::isConnected() const
 {
     return m_isConnected;
+}
+
+bool Mqttp::isInitializedAndLog() const
+{
+    if (m_client == nullptr) {
+        ESP_LOGE(LOG_TAG_MQTT, "Not initialized!");
+        return false;
+    }
+
+    return true;
 }
 
 MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb)
@@ -160,8 +156,39 @@ void Mqttp::publish(MqttPublisher *publisher, const std::string &value)
     esp_mqtt_client_publish(m_client, topic.c_str(), value.c_str(), 0, 0, 0);
 }
 
+void Mqttp::initializeAndStartClient()
+{
+    if (m_client != nullptr) {
+        ESP_LOGW(LOG_TAG_MQTT, "initializeAndStartClient, called when already initialized!");
+        return;
+    }
+    ESP_LOGD(LOG_TAG_MQTT, "initializeAndStartClient");
+
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    Config::init();
+#endif
+
+    const std::string broker = getBroker();
+    esp_mqtt_client_config_t mqtt_cfg = {
+            .uri = broker.c_str(),
+    };
+    ESP_LOGI(LOG_TAG_MQTT, "Using Broker \"%s\"", broker.c_str());
+
+    m_client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_register_event(m_client, MQTT_EVENT_CONNECTED, mqtt_event_connected, this);
+    esp_mqtt_client_register_event(m_client, MQTT_EVENT_DISCONNECTED, mqtt_event_disconnected, this);
+    esp_mqtt_client_register_event(m_client, MQTT_EVENT_DATA, mqtt_event_data, this);
+
+    startMqttClient();
+}
+
 void Mqttp::startMqttClient()
 {
+    if (m_client == nullptr) {
+        ESP_LOGE(LOG_TAG_MQTT, "can not start to connect when not initialized!");
+        return;
+    }
+
     esp_err_t err = esp_mqtt_client_start(m_client);
     if (err != ESP_OK) {
         ESP_LOGW(LOG_TAG_MQTT, "MQTT Start Error: \"%s\"", esp_err_to_name(err));
@@ -172,10 +199,10 @@ void Mqttp::startMqttClient()
 
 void Mqttp::onMqttConnected()
 {
-    setupAllSubscriptions();
-
     m_isConnected = true;
-    ESP_LOGI(LOG_TAG, "MQTT Connection established...");
+    ESP_LOGI(LOG_TAG_MQTT, "MQTT Connection established...");
+
+    setupAllSubscriptions();
 }
 
 void Mqttp::onMqttDisconnected()
@@ -195,12 +222,9 @@ void Mqttp::onMqttData(esp_mqtt_event_handle_t event)
                  subscriber->getGroupTopic().c_str()
                  );
 
-        if (subscriber->matchesTopic(topic)) {
-            ESP_LOGV(LOG_TAG_MQTT, "onMqttData, MATCH");
+        if (subscriber->isMatchForTopic(topic)) {
             // TODO maybe forward the matched topic (for the subscriber to know whether it was group or device topic)
             subscriber->handleEventData(event->data, event->data_len);
-        } else {
-            ESP_LOGV(LOG_TAG_MQTT, "onMqttData, NO MATCH");
         }
     }
 }
@@ -214,6 +238,11 @@ void Mqttp::setupAllSubscriptions()
 
 void Mqttp::setupOneSubscription(MqttSubscriber *subscriber)
 {
+    if (!isConnected()) {
+        ESP_LOGE(LOG_TAG_MQTT, "Not Connected! Can not subscribe for \"%s\"", subscriber->getTopic().c_str());
+        return;
+    }
+
     std::string deviceTopic = getDeviceTopic() + "/cmd/" + subscriber->getTopic();
     if (esp_mqtt_client_subscribe(m_client, deviceTopic.c_str(), 0) < 0) {
         ESP_LOGE(LOG_TAG_MQTT, "Failed to subscribe to \"%s\"", deviceTopic.c_str());

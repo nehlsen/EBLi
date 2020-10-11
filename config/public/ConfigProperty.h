@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 
+#define EventDataToConfigPropertyHandle(event_data) *(static_cast<ConfigProperty**>(event_data))
+
 class cJSON;
 
 namespace EBLi {
@@ -44,15 +46,17 @@ private:
     const std::string m_longKey;
 
     enum {
-        TYPE_UNKNOWN,
-        TYPE_INT,
-        TYPE_STRING,
+        TYPE_UNKNOWN = 0,
+        TYPE_INT = 1,
+        TYPE_STRING = 2,
     } m_type = TYPE_UNKNOWN;
     int m_defaultValueInt = 0;
     std::string m_defaultValueString;
 
     ConfigPropertyConstraint *m_constraint = nullptr;
     ChangeHandlerCallback m_changeHandler;
+
+    void emitChangeEvent();
 
     void toJson(cJSON *configObject) const;
     bool fromJson(cJSON *const propertyObject);

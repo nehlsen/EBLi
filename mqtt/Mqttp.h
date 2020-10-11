@@ -6,8 +6,7 @@
 #include "mqtt_client.h"
 #include "MqttSubscriber.h"
 
-namespace EBLi
-{
+namespace EBLi {
 
 class MqttPublisher;
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
@@ -33,6 +32,7 @@ public:
 
     void publish(MqttPublisher *publisher, const std::string &value);
 
+    void initializeAndStartClient();
     void startMqttClient();
     void onMqttConnected();
     void onMqttDisconnected();
@@ -40,7 +40,8 @@ public:
 
 private:
     bool m_isConnected = false;
-    esp_mqtt_client_handle_t m_client;
+    bool isInitializedAndLog() const;
+    esp_mqtt_client_handle_t m_client = nullptr;
 
     std::vector<MqttSubscriber*> m_subscribers;
     void setupAllSubscriptions();

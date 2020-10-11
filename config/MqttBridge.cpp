@@ -11,7 +11,8 @@ namespace EBLi::Config {
 
 static void onConfigPropertyEvent(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    auto configProperty = static_cast<ConfigProperty*>(event_data);
+    auto configProperty = EventDataToConfigPropertyHandle(event_data);
+
     ESP_ERROR_CHECK_WITHOUT_ABORT(nullptr == configProperty ? ESP_FAIL : ESP_OK);
     if (nullptr == configProperty) return;
 
@@ -40,13 +41,17 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
 
     auto mqtt = Mqtt::instance();
     mqtt->createSubscriber(createTopic(configProperty), [configProperty](const std::string &value) {
-//        ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Change callback for '%s' triggered", configProperty->getShortKey().c_str());
+        ESP_LOGV(LOG_TAG_CONFIG_MQTT,
+                 "Config Property Change-Callback triggered, property: '%s'",
+                 configProperty->getShortKey().c_str()
+        );
+
         if (configProperty->m_type == ConfigProperty::TYPE_INT) {
             configProperty->setValue(std::stoi(value));
         } else if (configProperty->m_type == ConfigProperty::TYPE_STRING) {
             configProperty->setValue(value);
         } else {
-            ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Can not update value for property '%s' - Type unknown", configProperty->getShortKey().c_str());
+            ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Can not update value for property '%s' - Type(%d) unknown", configProperty->getShortKey().c_str(), configProperty->m_type);
         }
     });
 

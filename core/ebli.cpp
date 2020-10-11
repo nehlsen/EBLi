@@ -17,7 +17,7 @@
 #if defined(CONFIG_ENABLE_EBLI_MQTT)
 #include <Mqtt.h>
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-#include "../config/MqttBridge.h"
+#include <MqttBridge.h>
 #endif
 #endif
 
@@ -47,14 +47,14 @@ void init_all()
 #endif
 
 #if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_ENABLE_EBLI_MQTT)
+    EBLi::Config::MqttBridge::setup();
+#endif
     EBLi::ConfigManager::init();
 #endif
 
 #if defined(CONFIG_ENABLE_EBLI_MQTT)
     EBLi::Mqtt::init();
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-    EBLi::MqttBridge::setup();
-#endif
 #endif
 
 #if defined(CONFIG_ENABLE_EBLI_TIME)

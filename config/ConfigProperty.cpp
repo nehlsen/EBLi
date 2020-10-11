@@ -84,7 +84,7 @@ void ConfigProperty::setValue(const int &value)
         m_changeHandler(this);
     }
 
-    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_CHANGED, (void*)this, sizeof(ConfigProperty), portMAX_DELAY);
+    emitChangeEvent();
 }
 
 void ConfigProperty::setValue(const std::string &value)
@@ -104,7 +104,7 @@ void ConfigProperty::setValue(const std::string &value)
         m_changeHandler(this);
     }
 
-    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_CHANGED, (void*)this, sizeof(ConfigProperty), portMAX_DELAY);
+    emitChangeEvent();
 }
 
 template<>
@@ -135,6 +135,13 @@ ConfigProperty *ConfigProperty::setChangeHandler(ChangeHandlerCallback cb)
 {
     m_changeHandler = cb;
     return this;
+}
+
+void ConfigProperty::emitChangeEvent()
+{
+    // FIXME this looks bad but i do not have a solution :(
+    ConfigProperty *pointerToThisConfigProperty = this;
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_CONFIG_PROPERTY_CHANGED, &pointerToThisConfigProperty, sizeof(ConfigProperty*), portMAX_DELAY);
 }
 
 void ConfigProperty::toJson(cJSON *configObject) const
