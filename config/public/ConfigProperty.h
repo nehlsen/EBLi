@@ -36,7 +36,6 @@ public:
     // new value? bool: change handler may deny new value?
 //    typedef std::function<bool(ConfigProperty *property)> ChangeHandlerCallback;
     typedef std::function<void(ConfigProperty *property)> ChangeHandlerCallback;
-    [[deprecated("use events instead")]]
     ConfigProperty *setChangeHandler(ChangeHandlerCallback cb);
 
 private:
