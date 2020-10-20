@@ -13,7 +13,7 @@ public:
 private:
     static bool m_isInitialized;
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     static void initConfig();
 #endif
 };

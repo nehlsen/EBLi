@@ -2,26 +2,26 @@
 #include <sdkconfig.h>
 #include <ebli_log.h>
 
-#if defined(CONFIG_ENABLE_EBLI_FS)
+#if defined(CONFIG_EBLI_FS_ENABLE)
 #include <FS.h>
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_WIFI)
+#if defined(CONFIG_EBLI_WIFI_ENABLE)
 #include <Wifi.h>
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 #include <ConfigManager.h>
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_MQTT)
+#if defined(CONFIG_EBLI_WIFI_ENABLE)
 #include <Mqtt.h>
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 #include <MqttBridge.h>
 #endif
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_TIME)
+#if defined(CONFIG_EBLI_TIME_ENABLE)
 #include <Time.h>
 #endif
 
@@ -46,26 +46,26 @@ void init_all()
     esp_log_level_set(LOG_TAG_TIME, ESP_LOG_VERBOSE);
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_FS)
+#if defined(CONFIG_EBLI_FS_ENABLE)
     ESP_ERROR_CHECK(EBLi::FS::init());
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_WIFI)
+#if defined(CONFIG_EBLI_WIFI_ENABLE)
     ESP_ERROR_CHECK(EBLi::Wifi::init());
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
-#if defined(CONFIG_ENABLE_EBLI_MQTT)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
+#if defined(CONFIG_EBLI_WIFI_ENABLE)
     EBLi::Config::MqttBridge::setup();
 #endif
     EBLi::ConfigManager::init();
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_MQTT)
+#if defined(CONFIG_EBLI_WIFI_ENABLE)
     EBLi::Mqtt::init();
 #endif
 
-#if defined(CONFIG_ENABLE_EBLI_TIME)
+#if defined(CONFIG_EBLI_TIME_ENABLE)
     EBLi::Time::init();
 #endif
 

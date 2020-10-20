@@ -9,7 +9,7 @@
 namespace EBLi {
 
 class MqttPublisher;
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 class ConfigProperty;
 #endif
 
@@ -47,7 +47,7 @@ private:
     void setupAllSubscriptions();
     void setupOneSubscription(MqttSubscriber *subscriber);
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     struct Config {
         static void init();
         static ConfigProperty *broker();

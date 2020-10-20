@@ -1,62 +1,62 @@
 menu "EBLi Configuration"
 
-    config ENABLE_EBLI_FS
+    config EBLI_FS_ENABLE
         bool "Enable FS"
         default false
 
     config EBLI_FS_FLASH_DATA_DIR
         string "Data dir used to seed the data partition"
-        depends on ENABLE_EBLI_FS
+        depends on EBLI_FS_ENABLE
         default "${PROJECT_SOURCE_DIR}/components/EBLi/fs/nodata"
 
-    config ENABLE_EBLI_WIFI
+    config EBLI_WIFI_ENABLE
         bool "Enable Wifi"
-        depends on ENABLE_EBLI_FS
+        depends on EBLI_FS_ENABLE
         default false
 
     config EBLI_WIFI_PROVISION_POP
         string "Wifi provisioning Proof-of-Possession"
-        depends on ENABLE_EBLI_WIFI
+        depends on EBLI_WIFI_ENABLE
         default "abcd1234"
         help
             Auto provisioning Proof-of-Possession
 
-    config ENABLE_EBLI_MQTT
+    config EBLI_MQTT_ENABLE
         bool "Enable MQTT"
-        depends on ENABLE_EBLI_WIFI
+        depends on EBLI_WIFI_ENABLE
         default false
 
     config EBLI_MQTT_DEFAULT_BROKER
         string "MQTT default/fall-back Broker - if no config manager or config manager has no value"
-        depends on ENABLE_EBLI_MQTT
+        depends on EBLI_MQTT_ENABLE
         default "mqtt://iot.eclipse.org"
     config EBLI_MQTT_DEFAULT_DEVICE_TOPIC
         string "MQTT default/fall-back Device-Topic - if no config manager or config manager has no value"
-        depends on ENABLE_EBLI_MQTT
+        depends on EBLI_MQTT_ENABLE
         default "ebli-device"
     config EBLI_MQTT_DEFAULT_GROUP_TOPIC
         string "MQTT default/fall-back Group-Topic - if no config manager or config manager has no value"
-        depends on ENABLE_EBLI_MQTT
+        depends on EBLI_MQTT_ENABLE
         default "ebli-device-group"
 
-    config ENABLE_EBLI_TIME
+    config EBLI_TIME_ENABLE
         bool "Enable Time (Timezone config and NTP Time sync)"
-        depends on ENABLE_EBLI_WIFI
+        depends on EBLI_WIFI_ENABLE
         default false
 
-    config ENABLE_EBLI_OTA
+    config EBLI_OTA_ENABLE
         bool "Enable OTA"
-        depends on ENABLE_EBLI_WIFI
+        depends on EBLI_WIFI_ENABLE
         default false
 
-    config ENABLE_EBLI_CONFIG_MANAGER
+    config EBLI_CONFIG_MANAGER_ENABLE
         bool "Enable Config-Manager"
-        depends on ENABLE_EBLI_FS
+        depends on EBLI_FS_ENABLE
         default false
 
     config EBLI_SENSORS_ENABLED
         bool "Enable the sensors sub-component"
-        depends on ENABLE_EBLI_MQTT
+        depends on EBLI_MQTT_ENABLE
         default false
 
     config EBLI_SENSORS_PUBLISH_DELAY

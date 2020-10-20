@@ -7,7 +7,7 @@
 #if defined(CONFIG_EBLI_SENSORS_AHT10_ENABLED)
 #include <AHT10.h>
 #endif
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 #include <ConfigManager.h>
 #endif
 
@@ -49,7 +49,7 @@ private:
 SensorsP::SensorsP()
 {
 #if defined(CONFIG_EBLI_SENSORS_AHT10_ENABLED)
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     auto configManager = EBLi::ConfigManager::instance();
     int i2cPinSda = configManager->property("aht10_i2c_sda")
             ->setDefaultValue(CONFIG_AHT10_PIN_SDA)

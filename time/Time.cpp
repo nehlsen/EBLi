@@ -2,7 +2,7 @@
 #include <ebli_log.h>
 #include <esp_event.h>
 #include <esp_sntp.h>
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 #include <ConfigManager.h>
 #endif
 
@@ -30,7 +30,7 @@ esp_err_t Time::init()
 
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_got_ip, nullptr);
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     initConfig();
 #endif
 
@@ -39,7 +39,7 @@ esp_err_t Time::init()
     return ESP_OK;
 }
 
-#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 void Time::initConfig()
 {
     auto updateTimezone = [](ConfigProperty *property) {
