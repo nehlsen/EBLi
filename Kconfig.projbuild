@@ -4,6 +4,11 @@ menu "EBLi Configuration"
         bool "Enable FS"
         default false
 
+    config EBLI_FS_FLASH_DATA_DIR
+        string "Data dir used to seed the data partition"
+        depends on ENABLE_EBLI_FS
+        default "${PROJECT_SOURCE_DIR}/components/EBLi/fs/nodata"
+
     config ENABLE_EBLI_WIFI
         bool "Enable Wifi"
         depends on ENABLE_EBLI_FS
