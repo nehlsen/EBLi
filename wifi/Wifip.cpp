@@ -6,6 +6,7 @@
 #include <wifi_provisioning/manager.h>
 #include <wifi_provisioning/scheme_ble.h>
 #include <cstring>
+#include <ebli_events.h>
 
 namespace EBLi {
 
@@ -16,12 +17,7 @@ static const char *PROVISIONING_SERVICE_PREFIX = "PROV_";
 esp_err_t Wifip::init()
 {
     tcpip_adapter_init();
-    esp_err_t ret = esp_event_loop_create_default();
-    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
-        return ret;
-    }
-
-    ret = provisionWifi();
+    esp_err_t ret = provisionWifi();
     if (ret != ESP_OK) {
         return ret;
     }
@@ -102,6 +98,7 @@ void Wifip::prov_service_name(char *service_name, size_t max)
 void Wifip::startWifiStation()
 {
     ESP_LOGI(LOG_TAG_WIFI, "Starting Wifi Station...");
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_WIFI_CONNECTING, nullptr, 0, EBLI_EVENTS_MAX_TICKS_TO_POST);
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
     ESP_ERROR_CHECK(esp_wifi_connect());
@@ -112,6 +109,7 @@ void Wifip::provisioning_event_handler(void *user_data, wifi_prov_cb_event_t eve
     switch (event) {
         case WIFI_PROV_START:
             ESP_LOGI(LOG_TAG_WIFI, "Provisioning started");
+            esp_event_post(EBLI_EVENTS, EBLI_EVENT_WIFI_PROVISIONING, nullptr, 0, EBLI_EVENTS_MAX_TICKS_TO_POST);
             break;
         case WIFI_PROV_CRED_RECV: {
             wifi_sta_config_t *wifi_sta_cfg = (wifi_sta_config_t *)event_data;
@@ -151,6 +149,7 @@ void Wifip::on_got_ip(void *arg, esp_event_base_t event_base, int32_t event_id, 
 
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
     ESP_LOGI(LOG_TAG_WIFI, "Got IP: IPv4 address: " IPSTR, IP2STR(&event->ip_info.ip));
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_WIFI_CONNECTED, nullptr, 0, EBLI_EVENTS_MAX_TICKS_TO_POST);
 }
 
 void Wifip::on_wifi_disconnect(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -175,6 +174,7 @@ void Wifip::on_wifi_disconnect(void *arg, esp_event_base_t event_base, int32_t e
     }
 
     ESP_LOGI(LOG_TAG_WIFI, "Wi-Fi disconnected (%d/%d), trying to reconnect...", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_WIFI_DISCONNECTED, nullptr, 0, EBLI_EVENTS_MAX_TICKS_TO_POST);
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 

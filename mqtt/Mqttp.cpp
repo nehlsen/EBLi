@@ -1,11 +1,12 @@
 #include "Mqttp.h"
 #include <MqttSubscriber.h>
 #include <MqttPublisher.h>
+#include <ebli_log.h>
+#include <ebli_events.h>
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 #include <ConfigManager.h>
 #include <ConfigPropertyConstraint.h>
 #endif
-#include <ebli_log.h>
 
 namespace EBLi {
 
@@ -201,6 +202,7 @@ void Mqttp::onMqttConnected()
 {
     m_isConnected = true;
     ESP_LOGI(LOG_TAG_MQTT, "MQTT Connection established...");
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_MQTT_CONNECTED, nullptr, 0, EBLI_EVENTS_MAX_TICKS_TO_POST);
 
     setupAllSubscriptions();
 }
@@ -209,6 +211,7 @@ void Mqttp::onMqttDisconnected()
 {
     m_isConnected = false;
     ESP_LOGI(LOG_TAG_MQTT, "MQTT Connection lost...");
+    esp_event_post(EBLI_EVENTS, EBLI_EVENT_MQTT_DISCONNECTED, nullptr, 0, EBLI_EVENTS_MAX_TICKS_TO_POST);
 }
 
 void Mqttp::onMqttData(esp_mqtt_event_handle_t event)
