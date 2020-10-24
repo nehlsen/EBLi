@@ -2,6 +2,10 @@
 #include <sdkconfig.h>
 #include <ebli_log.h>
 
+#if defined(CONFIG_EBLI_STATUS_ENABLE)
+#include <Status.h>
+#endif
+
 #if defined(CONFIG_EBLI_FS_ENABLE)
 #include <FS.h>
 #endif
@@ -38,11 +42,6 @@ namespace EBLi {
 
 void init_all()
 {
-    esp_err_t ret = esp_event_loop_create_default();
-    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE("EBLi:Core", "Failed to start event loop");
-    }
-
 #if defined(CONFIG_EBLI_DEBUG)
     esp_log_level_set(LOG_TAG_CONFIG, ESP_LOG_VERBOSE);
     esp_log_level_set(LOG_TAG_CONFIG_PROPERTY, ESP_LOG_VERBOSE);
@@ -52,6 +51,17 @@ void init_all()
     esp_log_level_set(LOG_TAG_SENSORS, ESP_LOG_VERBOSE);
     esp_log_level_set(LOG_TAG_TIME, ESP_LOG_VERBOSE);
     esp_log_level_set(LOG_TAG_WIFI, ESP_LOG_VERBOSE);
+    esp_log_level_set(LOG_TAG_STATUS, ESP_LOG_VERBOSE);
+#endif
+
+// TODO ifdef STATUS or WIFI or MQTT or ?
+    esp_err_t ret = esp_event_loop_create_default();
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE("EBLi:Core", "Failed to start event loop");
+    }
+
+#if defined(CONFIG_EBLI_STATUS_ENABLE)
+    auto s = new Status::Status();
 #endif
 
 #if defined(CONFIG_EBLI_FS_ENABLE)

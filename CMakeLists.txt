@@ -1,8 +1,18 @@
-set(EBLi_SRCS core/ebli.cpp status/Status.cpp utility/Delayer.cpp utility/led/LedBlinker.cpp)
-set(EBLi_PUBLIC_INCLUDE_DIRS core/public utility utility/led)
-set(EBLi_PRIV_INCLUDE_DIRS core status)
+set(EBLi_SRCS core/ebli.cpp)
+set(EBLi_PUBLIC_INCLUDE_DIRS core/public)
+set(EBLi_PRIV_INCLUDE_DIRS core)
 set(EBLi_PRIV_REQUIRES)
 set(EBLi_COMPONENTS_ENABLED)
+
+### UTILITIES
+list(APPEND EBLi_SRCS utility/Delayer.cpp utility/led/LedBlinker.cpp)
+list(APPEND EBLi_PRIV_INCLUDE_DIRS utility utility/led)
+
+if(CONFIG_EBLI_FS_ENABLE)
+    list(APPEND EBLi_SRCS status/Status.cpp)
+    list(APPEND EBLi_PRIV_INCLUDE_DIRS status)
+    list(APPEND EBLi_COMPONENTS_ENABLED "status")
+endif()
 
 if(CONFIG_EBLI_FS_ENABLE)
     list(APPEND EBLi_SRCS fs/FS.cpp)

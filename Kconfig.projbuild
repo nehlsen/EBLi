@@ -4,6 +4,15 @@ menu "EBLi Configuration"
         bool "Enable FS"
         default false
 
+    config EBLI_STATUS_ENABLE
+        bool "Enable EBLi Status LED for Wifi and MQTT Connection Status"
+        default false
+
+    config EBLI_STATUS_LED_GPIO_NUM
+        int "GPIO number for Status LED"
+        depends on EBLI_STATUS_ENABLE
+        default 2
+
     config EBLI_FS_FLASH_DATA_DIR
         string "Data dir used to seed the data partition"
         depends on EBLI_FS_ENABLE

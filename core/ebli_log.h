@@ -14,6 +14,7 @@
 #define LOG_TAG_SENSORS         "EBLi:Sensors"
 #define LOG_TAG_TIME            "EBLi:Time"
 #define LOG_TAG_WIFI            "EBLi:Wifi"
+#define LOG_TAG_STATUS          "EBLi:Status"
 // TODO add remaining sub-components
 
 #endif // EBLI_LOG_TAGS_H
