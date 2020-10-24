@@ -120,7 +120,7 @@ void SensorsP::initBattery()
     int voltageDividerR2 = configManager->property("battery_vd_r2")
             ->setDefaultValue(BATTERY_DEFAULT_VOLTAGE_DIVIDER_R2)
             ->getValue<int>();
-    ESP_LOGI(LOG_TAG_SENSORS, "Initializing Battery Sensor ADC Channel:%d, VD-R1:%d, VD-R1:%d", adcChannel, voltageDividerR1, voltageDividerR2);
+    ESP_LOGI(LOG_TAG_SENSORS, "Initializing Battery Sensor ADC Channel:%d, VD-R1:%d, VD-R2:%d", adcChannel, voltageDividerR1, voltageDividerR2);
     m_battery = new Battery(static_cast<adc1_channel_t>(adcChannel));
     m_battery->setVoltageDividerResistorValues(voltageDividerR1, voltageDividerR2);
 #else
