@@ -12,17 +12,26 @@ class Status
 public:
     Status();
 
-    enum State {
-        NOT_CONNECTED = 1,
-        WIFI_CONNECTED = 2,
-        MQTT_CONNECTED = 3,
+    enum WifiState {
+        WIFI_CONNECTING,
+        WIFI_PROVISIONING,
+        WIFI_CONNECTED,
+        WIFI_DISCONNECTED,
     };
-    State getState() const;
+    void setWifiState(WifiState state);
 
-    void setWifiConnected(bool isConnected);
+    enum MqttState {
+        MQTT_CONNECTED,
+        MQTT_DISCONNECTED,
+    };
+    void setMqttState(MqttState state);
 
 private:
-    bool m_wifiConnected = false;
+    Utility::LedBlinker *m_ledBlinker;
+    void updateBlinker();
+
+    WifiState m_wifiState = WIFI_DISCONNECTED;
+    MqttState m_mqttState = MQTT_DISCONNECTED;
 };
 
 }
