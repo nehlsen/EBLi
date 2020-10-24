@@ -13,6 +13,7 @@
 #define LOG_TAG_MQTT_SUBSCRIBER "EBLi:Mqtt:Subscriber"
 #define LOG_TAG_SENSORS         "EBLi:Sensors"
 #define LOG_TAG_TIME            "EBLi:Time"
+#define LOG_TAG_WIFI            "EBLi:Wifi"
 // TODO add remaining sub-components
 
 #endif // EBLI_LOG_TAGS_H

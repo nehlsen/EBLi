@@ -44,6 +44,7 @@ void init_all()
     esp_log_level_set(LOG_TAG_MQTT_SUBSCRIBER, ESP_LOG_VERBOSE);
     esp_log_level_set(LOG_TAG_SENSORS, ESP_LOG_VERBOSE);
     esp_log_level_set(LOG_TAG_TIME, ESP_LOG_VERBOSE);
+    esp_log_level_set(LOG_TAG_WIFI, ESP_LOG_VERBOSE);
 #endif
 
 #if defined(CONFIG_EBLI_FS_ENABLE)

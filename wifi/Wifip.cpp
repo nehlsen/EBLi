@@ -1,17 +1,13 @@
 #include "Wifip.h"
+#include <ebli_log.h>
 #include <tcpip_adapter.h>
 #include <esp_event.h>
-#include <esp_log.h>
 #include <esp_wifi.h>
 #include <wifi_provisioning/manager.h>
 #include <wifi_provisioning/scheme_ble.h>
 #include <cstring>
 
-namespace EBLi
-{
-
-static const char *LOG_TAG = "EBLi:Wifi";
-
+namespace EBLi {
 
 #define RESET_WIFI_AFTER_ERROR_COUNT 15
 static uint8_t wifi_connect_error_count = 0;
@@ -60,7 +56,7 @@ esp_err_t Wifip::provisionWifi()
     if (!provisioned) {
         startProvisioning();
     } else {
-        ESP_LOGI(LOG_TAG, "Already provisioned, starting Wi-Fi Station");
+        ESP_LOGI(LOG_TAG_WIFI, "Already provisioned, starting Wi-Fi Station");
         wifi_prov_mgr_deinit();
         startWifiStation();
     }
@@ -70,7 +66,7 @@ esp_err_t Wifip::provisionWifi()
 
 void Wifip::startProvisioning()
 {
-    ESP_LOGI(LOG_TAG, "Starting provisioning");
+    ESP_LOGI(LOG_TAG_WIFI, "Starting provisioning");
 
     char advertisedBleDeviceName[12];
     prov_service_name(advertisedBleDeviceName, sizeof(advertisedBleDeviceName));
@@ -105,7 +101,7 @@ void Wifip::prov_service_name(char *service_name, size_t max)
 
 void Wifip::startWifiStation()
 {
-    ESP_LOGI(LOG_TAG, "Starting Wifi Station...");
+    ESP_LOGI(LOG_TAG_WIFI, "Starting Wifi Station...");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
     ESP_ERROR_CHECK(esp_wifi_connect());
@@ -115,14 +111,14 @@ void Wifip::provisioning_event_handler(void *user_data, wifi_prov_cb_event_t eve
 {
     switch (event) {
         case WIFI_PROV_START:
-            ESP_LOGI(LOG_TAG, "Provisioning started");
+            ESP_LOGI(LOG_TAG_WIFI, "Provisioning started");
             break;
         case WIFI_PROV_CRED_RECV: {
             wifi_sta_config_t *wifi_sta_cfg = (wifi_sta_config_t *)event_data;
             /* If SSID length is exactly 32 bytes, null termination
              * will not be present, so explicitly obtain the length */
             size_t ssid_len = strnlen((const char *)wifi_sta_cfg->ssid, sizeof(wifi_sta_cfg->ssid));
-            ESP_LOGI(LOG_TAG,
+            ESP_LOGI(LOG_TAG_WIFI,
                      "Received Wi-Fi credentials\n\tSSID     : %.*s\n\tPassword : %s",
                      ssid_len, (const char *) wifi_sta_cfg->ssid,
                      (const char *) wifi_sta_cfg->password
@@ -131,14 +127,14 @@ void Wifip::provisioning_event_handler(void *user_data, wifi_prov_cb_event_t eve
         }
         case WIFI_PROV_CRED_FAIL: {
             wifi_prov_sta_fail_reason_t *reason = (wifi_prov_sta_fail_reason_t *)event_data;
-            ESP_LOGE(LOG_TAG,
+            ESP_LOGE(LOG_TAG_WIFI,
                      "Provisioning failed!\n\tReason : %s\n\tPlease reset to factory and retry provisioning",
                      (*reason == WIFI_PROV_STA_AUTH_ERROR) ? "Wi-Fi AP password incorrect" : "Wi-Fi AP not found"
             );
             break;
         }
         case WIFI_PROV_CRED_SUCCESS:
-            ESP_LOGI(LOG_TAG, "Provisioning successful");
+            ESP_LOGI(LOG_TAG_WIFI, "Provisioning successful");
             break;
         case WIFI_PROV_END:
             /* De-initialize manager once provisioning is finished */
@@ -154,7 +150,7 @@ void Wifip::on_got_ip(void *arg, esp_event_base_t event_base, int32_t event_id, 
     wifi_connect_error_count = 0;
 
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-    ESP_LOGI(LOG_TAG, "Got IP: IPv4 address: " IPSTR, IP2STR(&event->ip_info.ip));
+    ESP_LOGI(LOG_TAG_WIFI, "Got IP: IPv4 address: " IPSTR, IP2STR(&event->ip_info.ip));
 }
 
 void Wifip::on_wifi_disconnect(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -162,8 +158,8 @@ void Wifip::on_wifi_disconnect(void *arg, esp_event_base_t event_base, int32_t e
     wifi_connect_error_count += 1;
 
     if (wifi_connect_error_count == RESET_WIFI_AFTER_ERROR_COUNT) {
-        ESP_LOGW(LOG_TAG, "Wi-Fi disconnected - limit reached (%d/%d)", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
-        ESP_LOGW(LOG_TAG, "resetting Wi-Fi Config...");
+        ESP_LOGW(LOG_TAG_WIFI, "Wi-Fi disconnected - limit reached (%d/%d)", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
+        ESP_LOGW(LOG_TAG_WIFI, "resetting Wi-Fi Config...");
 
         wifi_config_t wifiCfg;
         esp_wifi_get_config(ESP_IF_WIFI_STA, &wifiCfg);
@@ -171,21 +167,21 @@ void Wifip::on_wifi_disconnect(void *arg, esp_event_base_t event_base, int32_t e
         std::memset(wifiCfg.sta.password, 0, sizeof(wifiCfg.sta.password));
 
         if (esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiCfg) != ESP_OK) {
-            ESP_LOGE(LOG_TAG, "failed to reset Wi-Fi config");
+            ESP_LOGE(LOG_TAG_WIFI, "failed to reset Wi-Fi config");
         } else {
-            ESP_LOGW(LOG_TAG, "config has been reset, next reboot will start provisioning mode...");
+            ESP_LOGW(LOG_TAG_WIFI, "config has been reset, next reboot will start provisioning mode...");
             countdownAndRestart(5);
         }
     }
 
-    ESP_LOGI(LOG_TAG, "Wi-Fi disconnected (%d/%d), trying to reconnect...", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
+    ESP_LOGI(LOG_TAG_WIFI, "Wi-Fi disconnected (%d/%d), trying to reconnect...", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
 void Wifip::countdownAndRestart(uint8_t countdown)
 {
     do {
-        ESP_LOGW(LOG_TAG, "reboot in %d...", countdown);
+        ESP_LOGW(LOG_TAG_WIFI, "reboot in %d...", countdown);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         countdown--;
     } while (countdown > 0);
