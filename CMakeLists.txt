@@ -1,6 +1,6 @@
-set(EBLi_SRCS core/ebli.cpp)
-set(EBLi_PUBLIC_INCLUDE_DIRS core/public)
-set(EBLi_PRIV_INCLUDE_DIRS core)
+set(EBLi_SRCS core/ebli.cpp status/Status.cpp utility/Delayer.cpp utility/led/LedBlinker.cpp)
+set(EBLi_PUBLIC_INCLUDE_DIRS core/public utility utility/led)
+set(EBLi_PRIV_INCLUDE_DIRS core status)
 set(EBLi_PRIV_REQUIRES)
 set(EBLi_COMPONENTS_ENABLED)
 

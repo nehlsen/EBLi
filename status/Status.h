@@ -1,6 +1,10 @@
 #ifndef EBLI_STATUS_H
 #define EBLI_STATUS_H
 
+namespace EBLi::Utility {
+class LedBlinker;
+}
+
 namespace EBLi::Status {
 
 class Status
