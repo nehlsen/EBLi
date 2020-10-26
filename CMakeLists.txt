@@ -8,7 +8,7 @@ set(EBLi_COMPONENTS_ENABLED)
 list(APPEND EBLi_SRCS utility/Delayer.cpp utility/led/LedBlinker.cpp)
 list(APPEND EBLi_PRIV_INCLUDE_DIRS utility utility/led)
 
-if(CONFIG_EBLI_FS_ENABLE)
+if(CONFIG_EBLI_STATUS_ENABLE)
     list(APPEND EBLi_SRCS status/Status.cpp)
     list(APPEND EBLi_PRIV_INCLUDE_DIRS status)
     list(APPEND EBLi_COMPONENTS_ENABLED "status")
