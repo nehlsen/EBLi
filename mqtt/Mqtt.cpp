@@ -24,9 +24,9 @@ bool Mqtt::isConnected() const
     return m_mqtt->isConnected();
 }
 
-MqttSubscriber *Mqtt::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb)
+MqttSubscriber *Mqtt::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope)
 {
-    return m_mqtt->createSubscriber(topic, cb);
+    return m_mqtt->createSubscriber(topic, cb, subscriptionScope);
 }
 
 MqttPublisher *Mqtt::createPublisher(std::string topic)

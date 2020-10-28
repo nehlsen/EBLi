@@ -16,12 +16,20 @@ public:
 
     typedef std::function<void(const std::string &value)> SubscriptionCallbackType;
 
+    enum SubscriptionScope {
+        ScopeDevice = 0x1,
+        ScopeGroup = 0x2,
+        ScopeDeviceAndGroup = ScopeDevice | ScopeGroup,
+    };
+    SubscriptionScope getSubscriptionScope() const;
+
 protected:
-    MqttSubscriber(std::string topic, SubscriptionCallbackType cb);
+    MqttSubscriber(std::string topic, SubscriptionCallbackType cb, SubscriptionScope subscriptionScope);
 
 private:
     const std::string m_topic;
     SubscriptionCallbackType m_subscriptionCallback;
+    SubscriptionScope m_subscriptionScope;
 
     void setDeviceTopic(const std::string &deviceTopic);
     std::string getDeviceTopic() const;

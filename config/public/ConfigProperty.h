@@ -13,6 +13,7 @@ namespace Config { class MqttBridge; }
 class ConfigManager;
 class ConfigPropertyConstraint;
 
+// FIXME value and default value could maybe be stored in a std::variant<> ?!
 class ConfigProperty
 {
 friend class ConfigManager;
@@ -38,6 +39,29 @@ public:
     typedef std::function<void(ConfigProperty *property)> ChangeHandlerCallback;
     ConfigProperty *setChangeHandler(ChangeHandlerCallback cb);
 
+    // properties are always visible via the config manager and the property itself
+    // the visibility flag has an effect on MQTT and REST only
+    enum Visibility {
+        Hidden,
+        Device,
+        Group,
+    };
+    Visibility getVisibility() const;
+    bool isVisibilityHidden() const;
+    bool isVisibilityDevice() const;
+    bool isVisibilityGroup() const;
+    ConfigProperty *setVisibility(Visibility visibility);
+
+    // properties are always writable via the config manager and the property itself
+    // the accessibility flag has an effect on MQTT and REST only
+    enum Accessibility {
+        ReadOnly,
+        ReadWrite,
+    };
+    Accessibility getAccessibility() const;
+    bool isAccessibilityReadOnly() const;
+    ConfigProperty *setAccessibility(Accessibility accessibility);
+
 private:
     ConfigProperty(std::string shortKey, std::string longKey);
 
@@ -54,6 +78,9 @@ private:
 
     ConfigPropertyConstraint *m_constraint = nullptr;
     ChangeHandlerCallback m_changeHandler;
+
+    Visibility m_visibility = Group;
+    Accessibility m_accessibility = ReadWrite;
 
     void emitChangeEvent();
 

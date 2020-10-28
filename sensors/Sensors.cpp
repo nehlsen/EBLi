@@ -90,9 +90,11 @@ void SensorsP::initAht10()
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     auto configManager = EBLi::ConfigManager::instance();
     int i2cPinSda = configManager->property("aht10_i2c_sda")
+            ->setVisibility(EBLi::ConfigProperty::Device)
             ->setDefaultValue(CONFIG_AHT10_PIN_SDA)
             ->getValue<int>();
     int i2cPinScl = configManager->property("aht10_i2c_scl")
+            ->setVisibility(EBLi::ConfigProperty::Device)
             ->setDefaultValue(CONFIG_AHT10_PIN_SCL)
             ->getValue<int>();
     ESP_LOGI(LOG_TAG_SENSORS, "Initializing AHT10 Sensor SDA:%d, SCL:%d", i2cPinSda, i2cPinScl);
@@ -112,12 +114,15 @@ void SensorsP::initBattery()
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     auto configManager = EBLi::ConfigManager::instance();
     int adcChannel = configManager->property("battery_adc_chn")
+            ->setVisibility(EBLi::ConfigProperty::Device)
             ->setDefaultValue(BATTERY_DEFAULT_ADC_CHANNEL)
             ->getValue<int>();
     int voltageDividerR1 = configManager->property("battery_vd_r1")
+            ->setVisibility(EBLi::ConfigProperty::Device)
             ->setDefaultValue(BATTERY_DEFAULT_VOLTAGE_DIVIDER_R1)
             ->getValue<int>();
     int voltageDividerR2 = configManager->property("battery_vd_r2")
+            ->setVisibility(EBLi::ConfigProperty::Device)
             ->setDefaultValue(BATTERY_DEFAULT_VOLTAGE_DIVIDER_R2)
             ->getValue<int>();
     ESP_LOGI(LOG_TAG_SENSORS, "Initializing Battery Sensor ADC Channel:%d, VD-R1:%d, VD-R2:%d", adcChannel, voltageDividerR1, voltageDividerR2);

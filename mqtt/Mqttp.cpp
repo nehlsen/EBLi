@@ -62,11 +62,11 @@ bool Mqttp::isInitializedAndLog() const
     return true;
 }
 
-MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb)
+MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope)
 {
     ESP_LOGD(LOG_TAG_MQTT, "Creating subscriber for \"%s\"", topic.c_str());
 
-    auto subscriber = new MqttSubscriber(topic, cb); // FIXME delete subscribers in DESTRUCTOR
+    auto subscriber = new MqttSubscriber(topic, cb, subscriptionScope); // FIXME delete subscribers in DESTRUCTOR
     m_subscribers.push_back(subscriber);
 
     if (isConnected()) {
@@ -250,13 +250,15 @@ void Mqttp::setupOneSubscription(MqttSubscriber *subscriber)
         subscriber->setDeviceTopic(deviceTopic);
     }
 
-    std::string groupTopic = getGroupTopic() + "/cmd/" + subscriber->getTopic();
-    if (esp_mqtt_client_subscribe(m_client, groupTopic.c_str(), 0) < 0) {
-        ESP_LOGE(LOG_TAG_MQTT, "Failed to subscribe to \"%s\"", groupTopic.c_str());
-        subscriber->setGroupTopic("");
-    } else {
-        ESP_LOGI(LOG_TAG_MQTT, "Subscribed to \"%s\"", groupTopic.c_str());
-        subscriber->setGroupTopic(groupTopic);
+    if (subscriber->getSubscriptionScope() & MqttSubscriber::ScopeGroup) {
+        std::string groupTopic = getGroupTopic() + "/cmd/" + subscriber->getTopic();
+        if (esp_mqtt_client_subscribe(m_client, groupTopic.c_str(), 0) < 0) {
+            ESP_LOGE(LOG_TAG_MQTT, "Failed to subscribe to \"%s\"", groupTopic.c_str());
+            subscriber->setGroupTopic("");
+        } else {
+            ESP_LOGI(LOG_TAG_MQTT, "Subscribed to \"%s\"", groupTopic.c_str());
+            subscriber->setGroupTopic(groupTopic);
+        }
     }
 }
 

@@ -19,7 +19,7 @@ public:
 
     bool isConnected() const;
 
-    MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb);
+    MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope = MqttSubscriber::ScopeDeviceAndGroup);
     MqttPublisher *createPublisher(std::string topic);
 
     std::string getBroker() const;

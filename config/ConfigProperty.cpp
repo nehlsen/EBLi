@@ -168,9 +168,51 @@ bool ConfigProperty::fromJson(cJSON *const propertyObject)
         setValue(propertyObject->valueint);
         return true;
     } else {
-        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "toJson: uncertain type!");
+        ESP_LOGW(LOG_TAG_CONFIG_PROPERTY, "fromJson: uncertain type!");
         return false;
     }
+}
+
+ConfigProperty::Visibility ConfigProperty::getVisibility() const
+{
+    return m_visibility;
+}
+
+bool ConfigProperty::isVisibilityHidden() const
+{
+    return getVisibility() == Visibility::Hidden;
+}
+
+bool ConfigProperty::isVisibilityDevice() const
+{
+    return getVisibility() == Visibility::Device;
+}
+
+bool ConfigProperty::isVisibilityGroup() const
+{
+    return getVisibility() == Visibility::Group;
+}
+
+ConfigProperty *ConfigProperty::setVisibility(ConfigProperty::Visibility visibility)
+{
+    m_visibility = visibility;
+    return this;
+}
+
+ConfigProperty::Accessibility ConfigProperty::getAccessibility() const
+{
+    return m_accessibility;
+}
+
+bool ConfigProperty::isAccessibilityReadOnly() const
+{
+    return getAccessibility() == Accessibility::ReadOnly;
+}
+
+ConfigProperty *ConfigProperty::setAccessibility(ConfigProperty::Accessibility accessibility)
+{
+    m_accessibility = accessibility;
+    return this;
 }
 
 }

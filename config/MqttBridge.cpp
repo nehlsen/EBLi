@@ -39,6 +39,14 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
 {
     assert(configProperty != nullptr);
 
+    if (configProperty->isVisibilityHidden() || configProperty->isAccessibilityReadOnly()) {
+        ESP_LOGD(LOG_TAG_CONFIG_MQTT,
+                 "Not subscribing, property '%s' is hidden or read-only",
+                 configProperty->getShortKey().c_str()
+                 );
+        return;
+    }
+
     auto mqtt = Mqtt::instance();
     mqtt->createSubscriber(createTopic(configProperty), [configProperty](const std::string &value) {
         ESP_LOGV(LOG_TAG_CONFIG_MQTT,
@@ -51,9 +59,12 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
         } else if (configProperty->m_type == ConfigProperty::TYPE_STRING) {
             configProperty->setValue(value);
         } else {
-            ESP_LOGW(LOG_TAG_CONFIG_MQTT, "Can not update value for property '%s' - Type(%d) unknown", configProperty->getShortKey().c_str(), configProperty->m_type);
+            ESP_LOGW(LOG_TAG_CONFIG_MQTT,
+                     "Can not update value for property '%s' - Type(%d) unknown",
+                     configProperty->getShortKey().c_str(), configProperty->m_type
+                     );
         }
-    });
+    }, configProperty->isVisibilityGroup() ? MqttSubscriber::ScopeGroup : MqttSubscriber::ScopeDevice);
 
     // the subscriber will be left as dangling pointer for the rest of the program runtime
 }
@@ -61,6 +72,14 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
 void MqttBridge::handleChanged(ConfigProperty *configProperty)
 {
     assert(configProperty != nullptr);
+
+    if (configProperty->isVisibilityHidden()) {
+        ESP_LOGD(LOG_TAG_CONFIG_MQTT,
+                 "Not publishing, property '%s' is hidden",
+                 configProperty->getShortKey().c_str()
+        );
+        return;
+    }
 
     MqttPublisher *publisher = EBLi::Mqtt::instance()
             ->createPublisher(createTopic(configProperty));

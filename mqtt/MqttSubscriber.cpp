@@ -9,8 +9,13 @@ std::string MqttSubscriber::getTopic() const
     return m_topic;
 }
 
-MqttSubscriber::MqttSubscriber(std::string topic, SubscriptionCallbackType cb):
-    m_topic(std::move(topic)), m_subscriptionCallback(cb)
+MqttSubscriber::SubscriptionScope MqttSubscriber::getSubscriptionScope() const
+{
+    return m_subscriptionScope;
+}
+
+MqttSubscriber::MqttSubscriber(std::string topic, SubscriptionCallbackType cb, SubscriptionScope subscriptionScope):
+    m_topic(std::move(topic)), m_subscriptionCallback(cb), m_subscriptionScope(subscriptionScope)
 {}
 
 void MqttSubscriber::setDeviceTopic(const std::string &deviceTopic)
