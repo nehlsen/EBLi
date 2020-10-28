@@ -78,6 +78,11 @@ menu "EBLi Configuration"
         depends on EBLI_SENSORS_ENABLED
         default false
 
+    config EBLI_SENSORS_BATTERY_ENABLED
+        bool "Enable Battery sensor"
+        depends on EBLI_SENSORS_ENABLED
+        default false
+
     config EBLI_DEBUG
         bool "Set all Log-Levels to maximum"
         default false

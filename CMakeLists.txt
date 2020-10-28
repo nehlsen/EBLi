@@ -77,14 +77,14 @@ if(CONFIG_EBLI_SENSORS_ENABLED)
     list(APPEND EBLi_PRIV_INCLUDE_DIRS sensors)
     list(APPEND EBLi_COMPONENTS_ENABLED "sensors")
 
-    # if aht10
-    list(APPEND EBLi_PRIV_REQUIRES AHT10-IDF)
-    # endif
+    if(CONFIG_EBLI_SENSORS_AHT10_ENABLED)
+        list(APPEND EBLi_PRIV_REQUIRES AHT10-IDF)
+    endif()
 
-    # if battery
-    list(APPEND EBLi_SRCS sensors/Battery.cpp)
-    list(APPEND EBLi_PRIV_REQUIRES esp_adc_cal)
-    # endif
+    if(CONFIG_EBLI_SENSORS_BATTERY_ENABLED)
+        list(APPEND EBLi_SRCS sensors/Battery.cpp)
+        list(APPEND EBLi_PRIV_REQUIRES esp_adc_cal)
+    endif()
 endif()
 
 idf_component_register(

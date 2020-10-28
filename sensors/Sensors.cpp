@@ -1,5 +1,3 @@
-#define CONFIG_EBLI_SENSORS_BATTERY_ENABLED
-
 #include "Sensors.h"
 #include <ebli_log.h>
 #include <freertos/FreeRTOS.h>
