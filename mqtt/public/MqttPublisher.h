@@ -5,8 +5,7 @@
 
 class cJSON;
 
-namespace EBLi
-{
+namespace EBLi {
 
 class Mqttp;
 class MqttPublisher
@@ -14,17 +13,30 @@ class MqttPublisher
 friend class Mqttp;
 
 public:
-    std::string getTopic() const;
+    [[nodiscard]] std::string getTopic() const;
 
     void publishValue(uint8_t value);
     void publishValue(cJSON *jsonObject);
-    void publishValue(std::string value);
-    // TODO publish: int, float, JSON, ...
+    void publishValue(const std::string& value);
+
+    enum QualityOfService {
+        QosAtMostOnce = 0,
+        QosAtLeastOnce = 1,
+        QosExactlyOnce = 2,
+    };
+    [[nodiscard]] QualityOfService getQualityOfService() const;
+
+    enum RetainFlag {
+        NotRetainValue = 0,
+        RetainValue = 1,
+    };
+    [[nodiscard]] RetainFlag getRetainFlag() const;
 
 private:
-    explicit MqttPublisher(Mqttp *mqtt, std::string topic);
+    explicit MqttPublisher(Mqttp *mqtt, std::string topic, RetainFlag retainFlag);
     Mqttp *m_mqtt;
     const std::string m_topic;
+    const RetainFlag m_retainFlag;
 };
 
 }

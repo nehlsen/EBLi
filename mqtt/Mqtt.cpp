@@ -29,9 +29,9 @@ MqttSubscriber *Mqtt::createSubscriber(std::string topic, MqttSubscriber::Subscr
     return m_mqtt->createSubscriber(topic, cb, subscriptionScope);
 }
 
-MqttPublisher *Mqtt::createPublisher(std::string topic)
+MqttPublisher *Mqtt::createPublisher(std::string topic, MqttPublisher::RetainFlag retainFlag)
 {
-    return m_mqtt->createPublisher(topic);
+    return m_mqtt->createPublisher(topic, retainFlag);
 }
 
 std::string Mqtt::getBroker() const

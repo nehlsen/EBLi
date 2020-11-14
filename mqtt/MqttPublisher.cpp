@@ -3,11 +3,10 @@
 #include <utility>
 #include <cJSON.h>
 
-namespace EBLi
-{
+namespace EBLi {
 
-MqttPublisher::MqttPublisher(Mqttp *mqtt, std::string topic):
-    m_mqtt(mqtt), m_topic(std::move(topic))
+MqttPublisher::MqttPublisher(Mqttp *mqtt, std::string topic, RetainFlag retainFlag):
+    m_mqtt(mqtt), m_topic(std::move(topic)), m_retainFlag(retainFlag)
 {}
 
 std::string MqttPublisher::getTopic() const
@@ -27,9 +26,19 @@ void MqttPublisher::publishValue(cJSON *jsonObject)
     free(jsonBuffer);
 }
 
-void MqttPublisher::publishValue(std::string value)
+void MqttPublisher::publishValue(const std::string& value)
 {
     m_mqtt->publish(this, value);
+}
+
+MqttPublisher::QualityOfService MqttPublisher::getQualityOfService() const
+{
+    return QosAtMostOnce;
+}
+
+MqttPublisher::RetainFlag MqttPublisher::getRetainFlag() const
+{
+    return m_retainFlag;
 }
 
 }

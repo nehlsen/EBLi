@@ -5,10 +5,10 @@
 #include <vector>
 #include "mqtt_client.h"
 #include "MqttSubscriber.h"
+#include "MqttPublisher.h"
 
 namespace EBLi {
 
-class MqttPublisher;
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 class ConfigProperty;
 #endif
@@ -21,7 +21,7 @@ public:
     bool isConnected() const;
 
     MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope);
-    MqttPublisher *createPublisher(std::string topic);
+    MqttPublisher *createPublisher(std::string topic, MqttPublisher::RetainFlag retainFlag);
 
     std::string getBroker() const;
     void setBroker(const std::string& brokerUrl);

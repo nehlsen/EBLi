@@ -4,13 +4,11 @@
 #include <sdkconfig.h>
 #include <string>
 #include "MqttSubscriber.h"
+#include "MqttPublisher.h"
 
-namespace EBLi
-{
+namespace EBLi {
 
-class MqttPublisher;
 class Mqttp;
-
 class Mqtt
 {
 public:
@@ -20,7 +18,7 @@ public:
     bool isConnected() const;
 
     MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope = MqttSubscriber::ScopeDeviceAndGroup);
-    MqttPublisher *createPublisher(std::string topic);
+    MqttPublisher *createPublisher(std::string topic, MqttPublisher::RetainFlag retainFlag = MqttPublisher::RetainValue);
 
     std::string getBroker() const;
     void setBroker(const std::string& brokerUrl);

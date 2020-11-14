@@ -76,11 +76,11 @@ MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::Subsc
     return subscriber;
 }
 
-MqttPublisher *Mqttp::createPublisher(std::string topic)
+MqttPublisher *Mqttp::createPublisher(std::string topic, MqttPublisher::RetainFlag retainFlag)
 {
     ESP_LOGD(LOG_TAG_MQTT, "Creating publisher for \"%s\"", topic.c_str());
 
-    return new MqttPublisher(this, topic);
+    return new MqttPublisher(this, topic, retainFlag);
 }
 
 std::string Mqttp::getBroker() const
@@ -131,8 +131,9 @@ std::string Mqttp::getGroupTopic() const
 {
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     return Config::groupTopic()->getValue<std::string>();
-#endif
+#else
     return CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC;
+#endif
 }
 
 void Mqttp::setGroupTopic(const std::string &topic)
@@ -154,7 +155,14 @@ void Mqttp::publish(MqttPublisher *publisher, const std::string &value)
     std::string topic = getDeviceTopic() + "/state/" + publisher->getTopic();
     ESP_LOGD(LOG_TAG_MQTT, "Publishing to \"%s\"", topic.c_str());
 
-    esp_mqtt_client_publish(m_client, topic.c_str(), value.c_str(), 0, 0, 0);
+    esp_mqtt_client_publish(
+        m_client,
+        topic.c_str(),
+        value.c_str(),
+        0,
+        publisher->getQualityOfService(),
+        publisher->getRetainFlag()
+    );
 }
 
 void Mqttp::initializeAndStartClient()
