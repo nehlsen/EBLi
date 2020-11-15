@@ -49,21 +49,38 @@ if(CONFIG_EBLI_MQTT_ENABLE)
     list(APPEND EBLi_COMPONENTS_ENABLED "mqtt")
 endif()
 
+if(CONFIG_EBLI_HTTP_ENABLE)
+    list(APPEND EBLi_SRCS http/WebServer.cpp http/WebServerp.cpp http/HttpModule.cpp)
+    list(APPEND EBLi_SRCS http/modules/SystemInfo.cpp http/modules/SystemReboot.cpp http/modules/FileSystem.cpp)
+    list(APPEND EBLi_PUBLIC_INCLUDE_DIRS http/public)
+    list(APPEND EBLi_PRIV_REQUIRES json esp_http_server)
+    list(APPEND EBLi_COMPONENTS_ENABLED "http")
+endif()
+
 if(CONFIG_EBLI_OTA_ENABLE)
     list(APPEND EBLi_SRCS ota/OtaUpdater.cpp ota/OtaUpdaterPrivate.cpp)
     list(APPEND EBLi_PUBLIC_INCLUDE_DIRS ota/public)
     list(APPEND EBLi_PRIV_REQUIRES esp_https_ota app_update)
     list(APPEND EBLi_COMPONENTS_ENABLED "ota")
+
+    if(CONFIG_EBLI_HTTP_ENABLE)
+        list(APPEND EBLi_SRCS ota/OtaHttpModule.cpp)
+    endif()
 endif()
 
 if(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     list(APPEND EBLi_SRCS config/ConfigManager.cpp config/ConfigProperty.cpp config/ConfigPropertyConstraint.cpp)
     list(APPEND EBLi_PUBLIC_INCLUDE_DIRS config/public)
+    list(APPEND EBLi_COMPONENTS_ENABLED "config")
+
     if(CONFIG_EBLI_MQTT_ENABLE)
         list(APPEND EBLi_SRCS config/MqttBridge.cpp)
         list(APPEND EBLi_PRIV_INCLUDE_DIRS config)
     endif()
-    list(APPEND EBLi_COMPONENTS_ENABLED "config")
+
+    if(CONFIG_EBLI_HTTP_ENABLE)
+        list(APPEND EBLi_SRCS config/ConfigHttpModule.cpp)
+    endif()
 endif()
 
 if(CONFIG_EBLI_TIME_ENABLE)
@@ -92,7 +109,7 @@ idf_component_register(
         INCLUDE_DIRS ${EBLi_PUBLIC_INCLUDE_DIRS}
         PRIV_INCLUDE_DIRS ${EBLi_PRIV_INCLUDE_DIRS}
 #        PRIV_REQUIRES ${EBLi_PRIV_REQUIRES}
-        PRIV_REQUIRES "spiffs;nvs_flash;wifi_provisioning;mqtt;json;esp_https_ota;app_update;AHT10-IDF;esp_adc_cal"
+        PRIV_REQUIRES "spiffs;nvs_flash;wifi_provisioning;mqtt;json;esp_http_server;esp_https_ota;app_update;AHT10-IDF;esp_adc_cal"
 )
 
 list(JOIN EBLi_COMPONENTS_ENABLED ", " EBLi_COMPONENTS_ENABLED_OUT)

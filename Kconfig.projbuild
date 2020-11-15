@@ -48,6 +48,11 @@ menu "EBLi Configuration"
         depends on EBLI_MQTT_ENABLE
         default "ebli-device-group"
 
+    config EBLI_HTTP_ENABLE
+        bool "Enable HTTP"
+        depends on EBLI_WIFI_ENABLE
+        default false
+
     config EBLI_TIME_ENABLE
         bool "Enable Time (Timezone config and NTP Time sync)"
         depends on EBLI_WIFI_ENABLE

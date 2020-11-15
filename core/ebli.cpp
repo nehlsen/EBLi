@@ -18,11 +18,15 @@
 #include <ConfigManager.h>
 #endif
 
-#if defined(CONFIG_EBLI_WIFI_ENABLE)
+#if defined(CONFIG_EBLI_MQTT_ENABLE)
 #include <Mqtt.h>
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
-#include <MqttBridge.h>
+#include "../config/MqttBridge.h"
 #endif
+#endif
+
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+#include <WebServer.h>
 #endif
 
 #if defined(CONFIG_EBLI_TIME_ENABLE)
@@ -68,19 +72,23 @@ void init_all()
     ESP_ERROR_CHECK(EBLi::FS::init());
 #endif
 
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+    EBLi::http::WebServer::init();
+#endif
+
 #if defined(CONFIG_EBLI_WIFI_ENABLE)
     ESP_ERROR_CHECK(EBLi::Wifi::init());
 #endif
 
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
-#if defined(CONFIG_EBLI_WIFI_ENABLE)
-    EBLi::Config::MqttBridge::setup();
-#endif
+    #if defined(CONFIG_EBLI_MQTT_ENABLE)
+        EBLi::Config::MqttBridge::setup();
+    #endif
     EBLi::ConfigManager::init();
 #endif
 
-#if defined(CONFIG_EBLI_WIFI_ENABLE)
-    EBLi::Mqtt::init();
+#if defined(CONFIG_EBLI_MQTT_ENABLE)
+    EBLi::Mqtt::init(); // FIXME init before wifi to be able to react to on-got-ip?
 #endif
 
 #if defined(CONFIG_EBLI_TIME_ENABLE)
