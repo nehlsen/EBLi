@@ -5,6 +5,11 @@
 #include <tcpip_adapter.h>
 #include <esp_event.h>
 
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+#include <WebServer.h>
+#include "OtaHttpModule.h"
+#endif
+
 namespace EBLi {
 
 static const char *UPDATER_LOG_TAG = "EBLi:OtaUpdater";
@@ -55,6 +60,11 @@ OtaUpdater::OtaUpdater():
     esp_log_level_set("esp_https_ota", ESP_LOG_DEBUG); // log download progress
 
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_got_ip, m_updater);
+
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+    auto srv = http::WebServer::instance();
+    srv->addModule(ota::OtaHttpModule(this));
+#endif
 }
 
 void OtaUpdater::setUpdateUrl(const char *url)

@@ -4,6 +4,11 @@
 #include <cJSON.h>
 #include <ebli_events.h>
 
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+#include <WebServer.h>
+#include "ConfigHttpModule.h"
+#endif
+
 namespace EBLi {
 
 #define NVS_NAMESPACE "ebli_config"
@@ -18,6 +23,12 @@ ConfigManager *ConfigManager::init()
 {
     ConfigManager *singleton = instance();
     singleton->open();
+
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+    auto srv = http::WebServer::instance();
+    srv->addModule(config::ConfigHttpModule());
+#endif
+
     return singleton;
 }
 
@@ -40,10 +51,11 @@ bool ConfigManager::open()
         return false;
     }
 
-    logNvsState();
-    
-    updateRestartCounter();
     m_isOpen = true;
+
+    logNvsState();
+    updateRestartCounter();
+
     return true;
 }
 
@@ -65,6 +77,10 @@ bool ConfigManager::openNvs()
 
 void ConfigManager::logNvsState()
 {
+    if (!isOpen()) {
+        return;
+    }
+
     nvs_stats_t nvs_stats;
     nvs_get_stats(nullptr, &nvs_stats);
     ESP_LOGI(LOG_TAG_CONFIG, "NVS: UsedEntries = (%d), FreeEntries = (%d), AllEntries = (%d)",
@@ -263,6 +279,10 @@ cJSON *ConfigManager::toJson()
     cJSON *configObject = cJSON_CreateObject();
 
     for (auto property : m_properties) {
+        if (property->isVisibilityHidden()) {
+            continue;
+        }
+
         property->toJson(configObject);
     }
 
@@ -274,6 +294,10 @@ bool ConfigManager::fromJson(cJSON *configObject)
     bool atLeastOneValueChanged = false;
 
     for (auto property : m_properties) {
+        if (property->isAccessibilityReadOnly()) {
+            continue;
+        }
+
         cJSON *const propertyObject = cJSON_GetObjectItem(configObject, property->getLongKey().c_str());
         if (propertyObject) {
             atLeastOneValueChanged |= property->fromJson(propertyObject);

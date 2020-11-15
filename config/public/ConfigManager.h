@@ -43,8 +43,8 @@ public:
 
     int32_t getRestartCounter();
 
-    cJSON *toJson();
-    bool fromJson(cJSON *configObject);
+    cJSON *toJson(); //!< hides hidden properties
+    bool fromJson(cJSON *configObject); //!< ignores ro properties
 
 private:
     ConfigManager() = default;
