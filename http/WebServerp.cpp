@@ -4,7 +4,7 @@
 
 namespace EBLi::http {
 
-static const char *baseUri = "/api/v2"; //!< no trailing "/" !
+#define BASE_URI "/api/v2" //!< no trailing "/" !
 
 static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -89,7 +89,7 @@ void WebServerp::registerUriHandlers()
     ESP_LOGI(LOG_TAG_HTTP, "Registering URI handlers");
 
     httpd_uri_t system_info_get_uri = {
-            .uri = "/api/v2/*", // FIXME use baseUri
+            .uri = BASE_URI"/*",
             .method = HTTP_GET,
             .handler = genericHttpHandler,
             .user_ctx = this
@@ -97,7 +97,7 @@ void WebServerp::registerUriHandlers()
     httpd_register_uri_handler(m_hndlServer, &system_info_get_uri);
 
     httpd_uri_t system_reboot_post_uri = {
-            .uri = "/api/v2/*", // FIXME use baseUri
+            .uri = BASE_URI"/*",
             .method = HTTP_POST,
             .handler = genericHttpHandler,
             .user_ctx = this
@@ -117,7 +117,7 @@ module::HttpModule::HttpEndpoint* WebServerp::findHttpEndpoint(http_method metho
             }
 
             char checkUri[64];
-            sprintf(checkUri, "%s%s", baseUri, endpoint.uri);
+            sprintf(checkUri, "%s%s", BASE_URI, endpoint.uri);
             if (!httpd_uri_match_wildcard(checkUri, uri, strlen(uri))) {
                 continue;
             }
