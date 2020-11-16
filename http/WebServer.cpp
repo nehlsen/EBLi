@@ -20,9 +20,9 @@ WebServer* WebServer::instance()
 void WebServer::init()
 {
     auto srv = instance();
-    srv->addModule(module::SystemInfo());
-    srv->addModule(module::SystemReboot());
-    srv->addModule(module::FileSystem());
+    srv->addModule(new module::SystemInfo());
+    srv->addModule(new module::SystemReboot());
+    srv->addModule(new module::FileSystem());
 }
 
 WebServer::WebServer():
@@ -45,7 +45,7 @@ bool WebServer::isServerRunning() const
     return m_webServerp->isServerRunning();
 }
 
-void WebServer::addModule(const module::HttpModule &httpModule)
+void WebServer::addModule(module::HttpModule *httpModule)
 {
     m_webServerp->addModule(httpModule);
 }

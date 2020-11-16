@@ -17,7 +17,7 @@ public:
 
     [[nodiscard]] bool isServerRunning() const;
 
-    void addModule(const module::HttpModule &httpModule);
+    void addModule(module::HttpModule *httpModule);
 
 private:
     static WebServer *s_instance;

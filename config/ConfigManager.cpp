@@ -26,7 +26,7 @@ ConfigManager *ConfigManager::init()
 
 #if defined(CONFIG_EBLI_HTTP_ENABLE)
     auto srv = http::WebServer::instance();
-    srv->addModule(config::ConfigHttpModule());
+    srv->addModule(new config::ConfigHttpModule());
 #endif
 
     return singleton;

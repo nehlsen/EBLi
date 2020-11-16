@@ -29,7 +29,7 @@ void WebServerp::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG(); // FIXME check
-    config.max_uri_handlers = 13; // FIXME auto gen - depending on enabled features
+    config.max_uri_handlers = 2;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(LOG_TAG_HTTP, "Starting server on port: '%d'", config.server_port);
@@ -50,15 +50,11 @@ bool WebServerp::isServerRunning() const
     return m_hndlServer != nullptr;
 }
 
-void WebServerp::addModule(const module::HttpModule &httpModule)
+void WebServerp::addModule(module::HttpModule *httpModule)
 {
-    auto moduleEndpoints = httpModule.getHttpEndpoints();
     // TODO check if we have same method+uri already registered...
-//    for (const auto& endpoint : moduleEndpoints) {
-//        auto m = findHttpEndpoint(endpoint.method, endpoint.uri);
-//        // wont match because of baseUri
-//    }
-    std::copy(moduleEndpoints.begin(), moduleEndpoints.end(), std::back_inserter(m_httpEndpoints));
+
+    m_httpModules.push_back(httpModule);
 }
 
 esp_err_t WebServerp::genericHttpHandler(httpd_req_t *request)
@@ -114,18 +110,20 @@ void WebServerp::registerUriHandlers()
 
 module::HttpModule::HttpEndpoint* WebServerp::findHttpEndpoint(http_method method, const char *uri)
 {
-    for (auto& endpoint : m_httpEndpoints) {
-        if (endpoint.method != method) {
-            continue;
-        }
+    for (auto &module : m_httpModules) {
+        for (auto &endpoint : module->getHttpEndpoints()) {
+            if (endpoint.method != method) {
+                continue;
+            }
 
-        char checkUri[64];
-        sprintf(checkUri, "%s%s", baseUri, endpoint.uri);
-        if (!httpd_uri_match_wildcard(checkUri, uri, strlen(checkUri))) {
-            continue;
-        }
+            char checkUri[64];
+            sprintf(checkUri, "%s%s", baseUri, endpoint.uri);
+            if (!httpd_uri_match_wildcard(checkUri, uri, strlen(uri))) {
+                continue;
+            }
 
-        return &endpoint;
+            return &endpoint;
+        }
     }
 
     return nullptr;

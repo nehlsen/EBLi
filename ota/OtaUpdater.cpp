@@ -63,7 +63,7 @@ OtaUpdater::OtaUpdater():
 
 #if defined(CONFIG_EBLI_HTTP_ENABLE)
     auto srv = http::WebServer::instance();
-    srv->addModule(ota::OtaHttpModule(this));
+    srv->addModule(new ota::OtaHttpModule(this));
 #endif
 }
 
