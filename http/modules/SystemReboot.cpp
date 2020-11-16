@@ -5,10 +5,8 @@ namespace EBLi::http::module {
 std::vector<HttpModule::HttpEndpoint> SystemReboot::getHttpEndpoints() const
 {
     auto systemRebootHandler = [](httpd_req_t *request) {
-//        ESP_LOGI(LOG_TAG, "SYSTEM REBOOT TRIGGERED!");
-
-        esp_restart(); // TODO via PowerManager ?
-
+        httpd_resp_send(request, "", 0);
+        esp_restart();
         return ESP_OK;
     };
 
