@@ -9,6 +9,7 @@
 #define READ_BUFFER_SIZE 1024 * 5
 
 #define LOG_TAG LOG_TAG_HTTP ":ModFs"
+#define BASE_URI "/fs" //!< no trailing "/" !
 
 namespace EBLi::http::module {
 
@@ -41,7 +42,7 @@ std::vector<HttpModule::HttpEndpoint> FileSystem::getHttpEndpoints() const
     return {
         HttpEndpoint {
             .method = HTTP_GET,
-            .uri = "/fs/*", // FIXME this part (plus api/v2) has to be removed from the request to find the file on disc!
+            .uri = BASE_URI"/*",
             .handler = systemInfoHandler,
         },
     };
@@ -84,13 +85,23 @@ esp_err_t FileResponseHandler::doIt()
 
 void FileResponseHandler::determineRequestedFile()
 {
+    // this produces "/index.html" no matter what directory is accessed TODO
+    //   a) if uri is "/" this is ok
+    //   b) else a 404 or denies would be more appropriate
     if (m_request->uri[strlen(m_request->uri) - 1] == '/') {
         strlcat(m_requestedFile, "/index.html", sizeof(m_requestedFile));
     } else {
-        strlcat(m_requestedFile, m_request->uri, sizeof(m_requestedFile));
+        char *filename = strstr(m_request->uri, BASE_URI"/");
+        if (nullptr != filename) {
+            filename += strlen(BASE_URI); // keep trailing slash to be leading slash of filename
+
+            strlcat(m_requestedFile, filename, sizeof(m_requestedFile));
+        } else {
+            strlcat(m_requestedFile, m_request->uri, sizeof(m_requestedFile));
+        }
     }
 
-    ESP_LOGI(LOG_TAG, "Requested File: %s", m_requestedFile);
+    ESP_LOGI(LOG_TAG, "Requested File: \"%s\"", m_requestedFile);
 }
 
 void FileResponseHandler::setMimeType()
