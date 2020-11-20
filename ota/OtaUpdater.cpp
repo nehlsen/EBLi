@@ -1,31 +1,33 @@
 #include "OtaUpdater.h"
 #include "OtaUpdaterPrivate.h"
 #include <freertos/event_groups.h>
-#include <esp_log.h>
 #include <tcpip_adapter.h>
 #include <esp_event.h>
+#include <ebli_log.h>
 
 #if defined(CONFIG_EBLI_HTTP_ENABLE)
 #include <WebServer.h>
 #include "OtaHttpModule.h"
 #endif
 
-namespace EBLi {
+#if defined(CONFIG_EBLI_MQTT_ENABLE)
+#include "OtaMqttAdapter.h"
+#endif
 
-static const char *UPDATER_LOG_TAG = "EBLi:OtaUpdater";
+namespace EBLi::ota {
 
 #define UPDATER_RUNNING_BIT BIT1
 static EventGroupHandle_t ota_updater_event_group = nullptr;
 
 [[noreturn]] void ota_updater_task(void *pvParameter)
 {
-    ESP_LOGI(UPDATER_LOG_TAG, "Starting OTA Update Task...");
+    ESP_LOGI(LOG_TAG_OTA, "Starting OTA Update Task...");
 
     auto updater = static_cast<OtaUpdaterPrivate*>(pvParameter);
 
     while (true) { // this will only loop if the update fails
         xEventGroupWaitBits(ota_updater_event_group, UPDATER_RUNNING_BIT, false, false, portMAX_DELAY);
-        ESP_LOGI(UPDATER_LOG_TAG, "Starting Update...");
+        ESP_LOGI(LOG_TAG_OTA, "Starting Update...");
         updater->work();
         xEventGroupClearBits(ota_updater_event_group, UPDATER_RUNNING_BIT);
     }
@@ -63,7 +65,11 @@ OtaUpdater::OtaUpdater():
 
 #if defined(CONFIG_EBLI_HTTP_ENABLE)
     auto srv = http::WebServer::instance();
-    srv->addModule(new ota::OtaHttpModule(this));
+    srv->addModule(new OtaHttpModule(this));
+#endif
+
+#if defined(CONFIG_EBLI_HTTP_ENABLE)
+    new OtaMqttAdapter(this);
 #endif
 }
 

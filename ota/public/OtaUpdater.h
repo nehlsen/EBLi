@@ -3,7 +3,7 @@
 
 #include <esp_err.h>
 
-namespace EBLi {
+namespace EBLi::ota {
 
 class OtaUpdaterPrivate;
 

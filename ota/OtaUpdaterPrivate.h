@@ -3,7 +3,7 @@
 
 #include <esp_https_ota.h>
 
-namespace EBLi {
+namespace EBLi::ota {
 
 class OtaUpdaterPrivate
 {
@@ -19,6 +19,10 @@ public:
     esp_err_t lastError = ESP_OK;
 
     void work();
+
+private:
+    static void postEventMessage(int32_t event_id, const char *msg);
+    static void postEventMessage(int32_t event_id, char *msg);
 };
 
 }

@@ -14,6 +14,10 @@ enum {
     EBLI_EVENT_WIFI_DISCONNECTED,
     EBLI_EVENT_MQTT_CONNECTED,
     EBLI_EVENT_MQTT_DISCONNECTED,
+    EBLI_EVENT_OTA_STARTED,  // arg: char*, URL of the update
+    EBLI_EVENT_OTA_PROGRESS, // arg: char*, some info
+    EBLI_EVENT_OTA_FAILED,   // arg: char*, error message
+    EBLI_EVENT_OTA_SUCCEED,  // arg: char*, some info
 };
 
 // maximum ticks to wait to post an event to the event queue
