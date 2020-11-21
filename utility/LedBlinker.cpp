@@ -14,6 +14,7 @@ struct LedBlinkerP
 
     uint16_t timerDelayMs() const
     {
+        // FIXME this should never be 0
         return std::min(std::min(onTimeMs, offTimeMs), pauseTimeMs);
     }
 

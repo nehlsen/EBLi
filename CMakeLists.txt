@@ -5,8 +5,8 @@ set(EBLi_PRIV_REQUIRES)
 set(EBLi_COMPONENTS_ENABLED)
 
 ### UTILITIES
-list(APPEND EBLi_SRCS utility/Delayer.cpp utility/led/LedBlinker.cpp)
-list(APPEND EBLi_PRIV_INCLUDE_DIRS utility utility/led)
+list(APPEND EBLi_SRCS utility/Delayer.cpp utility/LedBlinker.cpp)
+list(APPEND EBLi_PUBLIC_INCLUDE_DIRS utility/public)
 
 if(CONFIG_EBLI_STATUS_ENABLE)
     list(APPEND EBLi_SRCS status/Status.cpp)
