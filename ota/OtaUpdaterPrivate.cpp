@@ -34,7 +34,7 @@ void OtaUpdaterPrivate::work()
     if (lastError == ESP_OK) {
         {
             char msg[MAX_MESSAGE_LENGTH];
-            sprintf(msg, "Update info: name:%s, version:%s, compiled: %s / %s",
+            sprintf(msg, "Image: %s, version:%s (%s / %s)",
                     updateInfo.project_name,
                     updateInfo.version,
                     updateInfo.date,
@@ -74,7 +74,7 @@ void OtaUpdaterPrivate::work()
 void OtaUpdaterPrivate::postEventMessage(int32_t event_id, const char *msg)
 {
     char msgCopy[MAX_MESSAGE_LENGTH];
-    sprintf(msgCopy, "%.*s", MAX_MESSAGE_LENGTH, msg);
+    sprintf(msgCopy, "%.*s", MAX_MESSAGE_LENGTH-1, msg);
 
     postEventMessage(event_id, msgCopy);
 }

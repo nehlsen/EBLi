@@ -68,7 +68,7 @@ OtaUpdater::OtaUpdater():
     srv->addModule(new OtaHttpModule(this));
 #endif
 
-#if defined(CONFIG_EBLI_HTTP_ENABLE)
+#if defined(CONFIG_EBLI_MQTT_ENABLE)
     new OtaMqttAdapter(this);
 #endif
 }

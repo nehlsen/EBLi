@@ -63,6 +63,10 @@ if(CONFIG_EBLI_OTA_ENABLE)
     list(APPEND EBLi_PRIV_REQUIRES esp_https_ota app_update)
     list(APPEND EBLi_COMPONENTS_ENABLED "ota")
 
+    if(CONFIG_EBLI_MQTT_ENABLE)
+        list(APPEND EBLi_SRCS ota/OtaMqttAdapter.cpp)
+    endif()
+
     if(CONFIG_EBLI_HTTP_ENABLE)
         list(APPEND EBLi_SRCS ota/OtaHttpModule.cpp)
     endif()
