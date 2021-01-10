@@ -4,6 +4,11 @@ namespace EBLi::http::module {
 
 esp_err_t HttpModule::sendJsonResponse(cJSON *jsonData, httpd_req_t *request, const char *httpStatus)
 {
+    if (jsonData == nullptr) {
+        httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Internal Error");
+        return ESP_FAIL;
+    }
+
     httpd_resp_set_status(request, httpStatus);
     httpd_resp_set_type(request, "application/json");
 
@@ -58,14 +63,14 @@ esp_err_t HttpModule::jsonRequestHelper(httpd_req_t *request, const std::functio
         if (jsonResponseData == nullptr) {
             httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "JSON is missing keys or has invalid values");
         } else {
-            jsonResponse(jsonResponseData, request, "400 Bad Request");
+            sendJsonResponse(jsonResponseData, request, "400 Bad Request");
         }
         cJSON_Delete(jsonRequestData);
         return ESP_FAIL;
     }
 
     cJSON_Delete(jsonRequestData);
-    return jsonResponse(jsonResponseData, request);
+    return sendJsonResponse(jsonResponseData, request);
 }
 
 esp_err_t HttpModule::handlePost(httpd_req_t *req, const std::function<bool(cJSON *, cJSON **)> &jsonHandler)
