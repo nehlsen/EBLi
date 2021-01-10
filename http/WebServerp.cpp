@@ -29,6 +29,7 @@ void WebServerp::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG(); // FIXME check
+    config.stack_size = 5 * 1024;
     config.max_uri_handlers = 2;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
@@ -88,21 +89,21 @@ void WebServerp::registerUriHandlers()
 {
     ESP_LOGI(LOG_TAG_HTTP, "Registering URI handlers");
 
-    httpd_uri_t system_info_get_uri = {
+    httpd_uri_t wildcard_uri_get = {
             .uri = BASE_URI"/*",
             .method = HTTP_GET,
             .handler = genericHttpHandler,
             .user_ctx = this
     };
-    httpd_register_uri_handler(m_hndlServer, &system_info_get_uri);
+    httpd_register_uri_handler(m_hndlServer, &wildcard_uri_get);
 
-    httpd_uri_t system_reboot_post_uri = {
+    httpd_uri_t wildcard_uri_post = {
             .uri = BASE_URI"/*",
             .method = HTTP_POST,
             .handler = genericHttpHandler,
             .user_ctx = this
     };
-    httpd_register_uri_handler(m_hndlServer, &system_reboot_post_uri);
+    httpd_register_uri_handler(m_hndlServer, &wildcard_uri_post);
 
     // TODO default index, e.g. redirect "/" (or "/index.html") to e.g. "/fs/index.html"
     //   or a special "fallback" handler for files?!
