@@ -20,6 +20,9 @@ std::vector<httpd_uri_t *> OtaHttpModule::getHandlers()
 esp_err_t OtaHttpModule::postOtaHttpHandler(httpd_req_t *request)
 {
     auto otaUpdater = static_cast<OtaUpdater*>(request->user_ctx);
+    if (nullptr == otaUpdater) {
+        return ESP_FAIL;
+    }
 
     return handlePost(request, [otaUpdater](cJSON *jsonRequestData, cJSON **jsonResponseData) -> bool {
         cJSON *const otaUrl = cJSON_GetObjectItem(jsonRequestData, "url");
