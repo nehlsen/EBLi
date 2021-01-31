@@ -118,3 +118,21 @@ idf_component_register(
 
 list(JOIN EBLi_COMPONENTS_ENABLED ", " EBLi_COMPONENTS_ENABLED_OUT)
 message("++ EBLi: enabled sub-components: ${EBLi_COMPONENTS_ENABLED_OUT}")
+
+execute_process(
+        COMMAND git describe --exact-match --tags
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE EBLi_VERSION_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+)
+execute_process(
+        COMMAND git rev-parse --short HEAD
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE EBLi_VERSION_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+)
+message("++ EBLi Version: ${EBLi_VERSION_TAG} ${EBLi_VERSION_HASH}")
+configure_file(core/public/ebli_version.h.in ${CMAKE_BINARY_DIR}/generated/ebli_version.h)
+include_directories(${CMAKE_BINARY_DIR}/generated/)
