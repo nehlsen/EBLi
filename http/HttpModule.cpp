@@ -2,6 +2,16 @@
 
 namespace EBLi::http::module {
 
+bool HttpModule::isRegistered() const
+{
+    return m_isRegistered;
+}
+
+void HttpModule::setRegistered(bool isRegistered)
+{
+    m_isRegistered = isRegistered;
+}
+
 esp_err_t HttpModule::sendJsonResponse(cJSON *jsonData, httpd_req_t *request, const char *httpStatus)
 {
     if (jsonData == nullptr) {

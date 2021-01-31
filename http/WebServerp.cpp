@@ -4,8 +4,6 @@
 
 namespace EBLi::http {
 
-#define BASE_URI "/api/v2" //!< no trailing "/" !
-
 static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     auto webServerp = static_cast<WebServerp*>(event_handler_arg);
@@ -29,8 +27,8 @@ void WebServerp::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG(); // FIXME check
-    config.stack_size = 5 * 1024;
-    config.max_uri_handlers = 2;
+//    config.stack_size = 5 * 1024;
+//    config.max_uri_handlers = 2;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(LOG_TAG_HTTP, "Starting server on port: '%d'", config.server_port);
@@ -53,81 +51,50 @@ bool WebServerp::isServerRunning() const
 
 void WebServerp::addModule(module::HttpModule *httpModule)
 {
-    // TODO check if we have same method+uri already registered...
-
     m_httpModules.push_back(httpModule);
-}
 
-esp_err_t WebServerp::genericHttpHandler(httpd_req_t *request)
-{
-    char methodString[5];
-    switch (request->method) {
-        case HTTP_GET: sprintf(methodString, "GET"); break;
-        case HTTP_POST: sprintf(methodString, "POST"); break;
-        default: sprintf(methodString, "%d", request->method); break;
+    if (isServerRunning()) {
+        registerModuleHandlers(httpModule);
     }
-    ESP_LOGI(LOG_TAG_HTTP, "genericHttpHandler: [%s] '%s'", methodString, request->uri);
-
-    auto *server = static_cast<WebServerp*>(request->user_ctx);
-    if (!server) {
-        return ESP_FAIL;
-    }
-
-    auto endpoint = server->findHttpEndpoint(static_cast<http_method>(request->method), request->uri);
-    if (nullptr == endpoint) {
-        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, nullptr);
-    }
-
-    if (endpoint->handler(request) != ESP_OK) {
-        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, nullptr);
-    }
-
-    return ESP_OK;
 }
 
 void WebServerp::registerUriHandlers()
 {
     ESP_LOGI(LOG_TAG_HTTP, "Registering URI handlers");
 
-    httpd_uri_t wildcard_uri_get = {
-            .uri = BASE_URI"/*",
-            .method = HTTP_GET,
-            .handler = genericHttpHandler,
-            .user_ctx = this
-    };
-    httpd_register_uri_handler(m_hndlServer, &wildcard_uri_get);
-
-    httpd_uri_t wildcard_uri_post = {
-            .uri = BASE_URI"/*",
-            .method = HTTP_POST,
-            .handler = genericHttpHandler,
-            .user_ctx = this
-    };
-    httpd_register_uri_handler(m_hndlServer, &wildcard_uri_post);
-
-    // TODO default index, e.g. redirect "/" (or "/index.html") to e.g. "/fs/index.html"
-    //   or a special "fallback" handler for files?!
+    for (auto &module : m_httpModules) {
+        registerModuleHandlers(module);
+    }
 }
 
-module::HttpModule::HttpEndpoint* WebServerp::findHttpEndpoint(http_method method, const char *uri)
+void WebServerp::registerModuleHandlers(module::HttpModule *module)
 {
-    for (auto &module : m_httpModules) {
-        for (auto &endpoint : module->getHttpEndpoints()) {
-            if (endpoint.method != method) {
-                continue;
-            }
-
-            char checkUri[64];
-            sprintf(checkUri, "%s%s", BASE_URI, endpoint.uri);
-            if (!httpd_uri_match_wildcard(checkUri, uri, strlen(uri))) {
-                continue;
-            }
-
-            return &endpoint;
-        }
+    if (module->isRegistered()) {
+        return;
     }
 
-    return nullptr;
+    for (auto &handler : module->getHandlers()) {
+        ESP_LOGI(LOG_TAG_HTTP, "Registering Module handler: %s '%s'", http_method_str(handler->method), handler->uri);
+        auto registerResult = httpd_register_uri_handler(m_hndlServer, handler);
+        switch (registerResult) {
+            case ESP_OK:
+                ESP_LOGD(LOG_TAG_HTTP, "Module handler registered successfully");
+                module->setRegistered(true);
+                break;
+
+            case ESP_ERR_INVALID_ARG:
+                ESP_LOGE(LOG_TAG_HTTP, "Failed to register Module handler: Invalid Arguments");
+                break;
+
+            case ESP_ERR_HTTPD_HANDLERS_FULL:
+                ESP_LOGE(LOG_TAG_HTTP, "Failed to register Module handler: Too much handlers");
+                break;
+
+            case ESP_ERR_HTTPD_HANDLER_EXISTS:
+                ESP_LOGE(LOG_TAG_HTTP, "Failed to register Module handler: Same Method/URI already registered");
+                break;
+        }
+    }
 }
 
 }

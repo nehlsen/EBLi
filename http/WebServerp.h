@@ -18,14 +18,13 @@ public:
 
     void addModule(module::HttpModule *httpModule);
 
-    static esp_err_t genericHttpHandler(httpd_req_t *request);
-
 private:
     httpd_handle_t m_hndlServer = nullptr;
     void registerUriHandlers();
 
     std::vector<module::HttpModule*> m_httpModules;
-    module::HttpModule::HttpEndpoint* findHttpEndpoint(http_method method, const char *uri);
+
+    void registerModuleHandlers(module::HttpModule *module);
 };
 
 }
