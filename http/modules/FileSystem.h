@@ -8,7 +8,13 @@ namespace EBLi::http::module {
 class FileSystem : public HttpModule
 {
 public:
-    [[nodiscard]] std::vector<HttpEndpoint> getHttpEndpoints() const override;
+    FileSystem();
+
+    [[nodiscard]] std::vector<httpd_uri_t *> getHandlers() override;
+
+private:
+    httpd_uri_t m_filesystem_uri;
+    static esp_err_t getFileSystemHttpHandler(httpd_req_t *request);
 };
 
 }

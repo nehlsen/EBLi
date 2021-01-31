@@ -1,4 +1,5 @@
 #include "SystemInfo.h"
+#include <ebli_version.h>
 
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 #include <ConfigManager.h>
@@ -10,28 +11,32 @@
 
 namespace EBLi::http::module {
 
-std::vector<HttpModule::HttpEndpoint> SystemInfo::getHttpEndpoints() const
+SystemInfo::SystemInfo():
+    m_system_info_uri {
+        .uri = BASE_URI "/system/info",
+        .method = http_method::HTTP_GET,
+        .handler = SystemInfo::getSystemInfoHttpHandler,
+        .user_ctx = nullptr
+    }
+{}
+
+std::vector<httpd_uri_t *> SystemInfo::getHandlers()
 {
-    auto systemInfoHandler = [](httpd_req_t *request) {
-        cJSON *root = cJSON_CreateObject();
-        cJSON_AddStringToObject(root, "idfVersion", IDF_VER);
+    return {&m_system_info_uri};
+}
 
-        responseAddChipInfo(root);
-        responseAddLastResetReason(root);
-        responseAddRestartCounter(root);
-        responseAddOtaInfo(root);
-        responseAddEbliInfo(root);
+esp_err_t SystemInfo::getSystemInfoHttpHandler(httpd_req_t *request)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "idfVersion", IDF_VER);
 
-        return jsonResponse(root, request);
-    };
+    responseAddChipInfo(root);
+    responseAddLastResetReason(root);
+    responseAddRestartCounter(root);
+    responseAddOtaInfo(root);
+    responseAddEbliInfo(root);
 
-    return {
-        HttpEndpoint {
-            .method = HTTP_GET,
-            .uri = "/system/info",
-            .handler = systemInfoHandler,
-        },
-    };
+    return sendJsonResponse(root, request);
 }
 
 void SystemInfo::responseAddChipInfo(cJSON *responseObject)
@@ -101,7 +106,8 @@ void SystemInfo::responseAddOtaInfo(cJSON *responseObject)
 
 void SystemInfo::responseAddEbliInfo(cJSON *responseObject)
 {
-    // TODO responseAddEbliInfo
+    cJSON_AddStringToObject(responseObject, "EBLi_version", EBLi_VERSION_HASH);
+    cJSON_AddStringToObject(responseObject, "EBLi_components", EBLi_COMPONENTS_ENABLED);
 }
 
 }

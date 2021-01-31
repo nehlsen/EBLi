@@ -6,10 +6,10 @@
 #include <esp_ota_ops.h>
 
 #define FILE_PATH_MAX (ESP_VFS_PATH_MAX + 128)
-#define READ_BUFFER_SIZE 1024 * 5
+#define READ_BUFFER_SIZE (1024 * 5)
 
 #define LOG_TAG LOG_TAG_HTTP ":ModFs"
-#define BASE_URI "/fs" //!< no trailing "/" !
+#define FS_BASE_URI "/fs" //!< no trailing "/" !
 
 namespace EBLi::http::module {
 
@@ -33,19 +33,23 @@ protected:
     int m_fd;
 };
 
-std::vector<HttpModule::HttpEndpoint> FileSystem::getHttpEndpoints() const
-{
-    auto systemInfoHandler = [](httpd_req_t *request) {
-        return FileResponseHandler::handleRequest(request);
-    };
+FileSystem::FileSystem():
+        m_filesystem_uri {
+        .uri = BASE_URI FS_BASE_URI "/*",
+        .method = http_method::HTTP_GET,
+        .handler = FileSystem::getFileSystemHttpHandler,
+        .user_ctx = nullptr
+    }
+{}
 
-    return {
-        HttpEndpoint {
-            .method = HTTP_GET,
-            .uri = BASE_URI"/*",
-            .handler = systemInfoHandler,
-        },
-    };
+std::vector<httpd_uri_t *> FileSystem::getHandlers()
+{
+    return {&m_filesystem_uri};
+}
+
+esp_err_t FileSystem::getFileSystemHttpHandler(httpd_req_t *request)
+{
+    return FileResponseHandler::handleRequest(request);
 }
 
 /**********************************************************************************************************************/
@@ -56,7 +60,7 @@ esp_err_t FileResponseHandler::handleRequest(httpd_req_t *request)
 }
 
 FileResponseHandler::FileResponseHandler(httpd_req_t *request):
-    m_request(request), m_requestedFile("")
+    m_request(request), m_requestedFile(""), m_fd(0)
 {}
 
 esp_err_t FileResponseHandler::doIt()
@@ -91,9 +95,9 @@ void FileResponseHandler::determineRequestedFile()
     if (m_request->uri[strlen(m_request->uri) - 1] == '/') {
         strlcat(m_requestedFile, "/index.html", sizeof(m_requestedFile));
     } else {
-        char *filename = strstr(m_request->uri, BASE_URI"/");
+        char *filename = strstr(m_request->uri, FS_BASE_URI"/");
         if (nullptr != filename) {
-            filename += strlen(BASE_URI); // keep trailing slash to be leading slash of filename
+            filename += strlen(FS_BASE_URI); // keep trailing slash to be leading slash of filename
 
             strlcat(m_requestedFile, filename, sizeof(m_requestedFile));
         } else {

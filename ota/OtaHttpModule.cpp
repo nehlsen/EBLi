@@ -2,42 +2,46 @@
 
 namespace EBLi::ota {
 
-OtaHttpModule::OtaHttpModule(OtaUpdater *otaUpdater) : m_otaUpdater(otaUpdater)
+OtaHttpModule::OtaHttpModule(OtaUpdater *otaUpdater):
+    m_otaUpdater(otaUpdater),
+    m_ota_uri {
+        .uri = BASE_URI "/ota",
+        .method = http_method::HTTP_POST,
+        .handler = OtaHttpModule::postOtaHttpHandler,
+        .user_ctx = m_otaUpdater
+    }
 {}
 
-std::vector<http::module::HttpModule::HttpEndpoint> OtaHttpModule::getHttpEndpoints() const
+std::vector<httpd_uri_t *> OtaHttpModule::getHandlers()
 {
-    auto postOtaHandler = [=](httpd_req_t *request) {
-        return handlePost(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) -> bool {
-            cJSON *const otaUrl = cJSON_GetObjectItem(jsonRequestData, "url");
-            if (!otaUrl || !cJSON_IsString(otaUrl) || strlen(otaUrl->valuestring) <= 4) {
-                return false;
-            }
+    return {&m_ota_uri};
+}
 
-            if (!m_otaUpdater) {
-                return false;
-            }
-            m_otaUpdater->setUpdateUrl(otaUrl->valuestring);
+esp_err_t OtaHttpModule::postOtaHttpHandler(httpd_req_t *request)
+{
+    auto otaUpdater = static_cast<OtaUpdater*>(request->user_ctx);
 
-            *jsonResponseData = cJSON_CreateObject();
-            if (m_otaUpdater->startUpdate()) {
-                cJSON_AddStringToObject(*jsonResponseData, "msg", "update started");
-                return true;
-            } else {
-                cJSON_AddStringToObject(*jsonResponseData, "msg", "update failed");
-                cJSON_AddNumberToObject(*jsonResponseData, "code", m_otaUpdater->getLastError());
-                return false;
-            }
-        });
-    };
+    return handlePost(request, [otaUpdater](cJSON *jsonRequestData, cJSON **jsonResponseData) -> bool {
+        cJSON *const otaUrl = cJSON_GetObjectItem(jsonRequestData, "url");
+        if (!otaUrl || !cJSON_IsString(otaUrl) || strlen(otaUrl->valuestring) <= 4) {
+            return false;
+        }
 
-    return {
-        HttpEndpoint {
-            .method = HTTP_POST,
-            .uri = "/ota",
-            .handler = postOtaHandler,
-        },
-    };
+        if (!otaUpdater) {
+            return false;
+        }
+        otaUpdater->setUpdateUrl(otaUrl->valuestring);
+
+        *jsonResponseData = cJSON_CreateObject();
+        if (otaUpdater->startUpdate()) {
+            cJSON_AddStringToObject(*jsonResponseData, "msg", "update started");
+            return true;
+        } else {
+            cJSON_AddStringToObject(*jsonResponseData, "msg", "update failed");
+            cJSON_AddNumberToObject(*jsonResponseData, "code", otaUpdater->getLastError());
+            return false;
+        }
+    });
 }
 
 }

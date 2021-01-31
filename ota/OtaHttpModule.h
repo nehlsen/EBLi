@@ -11,10 +11,13 @@ class OtaHttpModule: public http::module::HttpModule
 public:
     explicit OtaHttpModule(OtaUpdater *otaUpdater);
 
-    [[nodiscard]] std::vector<HttpEndpoint> getHttpEndpoints() const override;
+    [[nodiscard]] std::vector<httpd_uri_t *> getHandlers() override;
 
 private:
     OtaUpdater *m_otaUpdater = nullptr;
+
+    httpd_uri_t m_ota_uri;
+    static esp_err_t postOtaHttpHandler(httpd_req_t *request);
 };
 
 }
