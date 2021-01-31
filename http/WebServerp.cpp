@@ -28,7 +28,7 @@ void WebServerp::startServer()
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG(); // FIXME check
 //    config.stack_size = 5 * 1024;
-//    config.max_uri_handlers = 2;
+    config.max_uri_handlers = 19;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(LOG_TAG_HTTP, "Starting server on port: '%d'", config.server_port);
