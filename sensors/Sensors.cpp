@@ -33,6 +33,8 @@ public:
 
     void publishAll();
 
+    int getPublishDelayMs() const;
+
 private:
 #if defined(CONFIG_EBLI_SENSORS_AHT10_ENABLED)
     void initAht10();
@@ -56,8 +58,7 @@ private:
 
     while (true) {
         if (sp) sp->publishAll();
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-//        vTaskDelay(CONFIG_EBLI_SENSORS_PUBLISH_DELAY / portTICK_PERIOD_MS);
+        vTaskDelay(sp->getPublishDelayMs() / portTICK_PERIOD_MS);
     }
 }
 
@@ -70,6 +71,14 @@ SensorsP::SensorsP()
 #if defined(CONFIG_EBLI_SENSORS_BATTERY_ENABLED)
     initBattery();
 #endif
+
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
+    EBLi::ConfigManager::instance()
+            ->property("sens_pub_delay", "SensorsPublishDelay")
+            ->setVisibility(EBLi::ConfigProperty::Visibility::Device)
+            ->setDefaultValue(CONFIG_EBLI_SENSORS_PUBLISH_DELAY);
+#endif
+    ESP_LOGI(LOG_TAG_SENSORS, "Publishing Sensor values every %dms", getPublishDelayMs());
 
     xTaskCreatePinnedToCore(
             &sensors_task,
@@ -152,6 +161,15 @@ void SensorsP::publishAll()
     m_batteryRawPublisher->publishValue(std::to_string(m_battery->getRawValue()));
     m_batteryVoltagePublisher->publishValue(std::to_string(m_battery->getVoltage()));
 //    m_batteryVoltageOnPortPublisher->publishValue(std::to_string(m_battery->getVoltageOnPort()));
+#endif
+}
+
+int SensorsP::getPublishDelayMs() const
+{
+#if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
+    return EBLi::ConfigManager::instance()->property("sens_pub_delay")->getValue<int>();
+#else
+    return CONFIG_EBLI_SENSORS_PUBLISH_DELAY;
 #endif
 }
 
