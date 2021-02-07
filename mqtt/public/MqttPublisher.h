@@ -5,7 +5,7 @@
 
 class cJSON;
 
-namespace EBLi {
+namespace EBLi::mqtt {
 
 class Mqttp;
 class MqttPublisher

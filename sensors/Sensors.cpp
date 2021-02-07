@@ -39,15 +39,15 @@ private:
 #if defined(CONFIG_EBLI_SENSORS_AHT10_ENABLED)
     void initAht10();
     AHT10 *m_aht10 = nullptr;
-    EBLi::MqttPublisher *m_aht10TemperaturePublisher;
-    EBLi::MqttPublisher *m_aht10HumidityPublisher;
+    mqtt::MqttPublisher *m_aht10TemperaturePublisher;
+    mqtt::MqttPublisher *m_aht10HumidityPublisher;
 #endif
 #if defined(CONFIG_EBLI_SENSORS_BATTERY_ENABLED)
     void initBattery();
     Battery *m_battery = nullptr;
-    EBLi::MqttPublisher *m_batteryRawPublisher;
-    EBLi::MqttPublisher *m_batteryVoltagePublisher;
-//    EBLi::MqttPublisher *m_batteryVoltageOnPortPublisher;
+    mqtt::MqttPublisher *m_batteryRawPublisher;
+    mqtt::MqttPublisher *m_batteryVoltagePublisher;
+//    mqtt::MqttPublisher *m_batteryVoltageOnPortPublisher;
 #endif
 };
 
@@ -73,9 +73,9 @@ SensorsP::SensorsP()
 #endif
 
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
-    EBLi::ConfigManager::instance()
+    config::ConfigManager::instance()
             ->property("sens_pub_delay", "SensorsPublishDelay")
-            ->setVisibility(EBLi::ConfigProperty::Visibility::Device)
+            ->setVisibility(config::ConfigProperty::Visibility::Device)
             ->setDefaultValue(CONFIG_EBLI_SENSORS_PUBLISH_DELAY);
 #endif
     ESP_LOGI(LOG_TAG_SENSORS, "Publishing Sensor values every %dms", getPublishDelayMs());
@@ -95,13 +95,13 @@ SensorsP::SensorsP()
 void SensorsP::initAht10()
 {
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
-    auto configManager = EBLi::ConfigManager::instance();
+    auto configManager = config::ConfigManager::instance();
     int i2cPinSda = configManager->property("aht10_i2c_sda")
-            ->setVisibility(EBLi::ConfigProperty::Device)
+            ->setVisibility(config::ConfigProperty::Device)
             ->setDefaultValue(CONFIG_AHT10_PIN_SDA)
             ->getValue<int>();
     int i2cPinScl = configManager->property("aht10_i2c_scl")
-            ->setVisibility(EBLi::ConfigProperty::Device)
+            ->setVisibility(config::ConfigProperty::Device)
             ->setDefaultValue(CONFIG_AHT10_PIN_SCL)
             ->getValue<int>();
     ESP_LOGI(LOG_TAG_SENSORS, "Initializing AHT10 Sensor SDA:%d, SCL:%d", i2cPinSda, i2cPinScl);
@@ -109,7 +109,7 @@ void SensorsP::initAht10()
 #else
     m_aht10 = new AHT10;
 #endif
-    auto mqtt = EBLi::Mqtt::instance();
+    auto mqtt = mqtt::Mqtt::instance();
     m_aht10TemperaturePublisher = mqtt->createPublisher("aht10/temperature");
     m_aht10HumidityPublisher = mqtt->createPublisher("aht10/humidity");
 }
@@ -167,7 +167,7 @@ void SensorsP::publishAll()
 int SensorsP::getPublishDelayMs() const
 {
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
-    return EBLi::ConfigManager::instance()->property("sens_pub_delay")->getValue<int>();
+    return config::ConfigManager::instance()->property("sens_pub_delay")->getValue<int>();
 #else
     return CONFIG_EBLI_SENSORS_PUBLISH_DELAY;
 #endif

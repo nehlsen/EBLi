@@ -6,7 +6,7 @@
 #include "MqttSubscriber.h"
 #include "MqttPublisher.h"
 
-namespace EBLi {
+namespace EBLi::mqtt {
 
 class Mqttp;
 class Mqtt

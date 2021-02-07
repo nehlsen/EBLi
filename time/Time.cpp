@@ -42,11 +42,11 @@ esp_err_t Time::init()
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
 void Time::initConfig()
 {
-    auto updateTimezone = [](ConfigProperty *property) {
+    auto updateTimezone = [](config::ConfigProperty *property) {
         setenv("TZ", property->getValue<std::string>().c_str(), 1);
         tzset();
     };
-    auto timezoneConfig = ConfigManager::instance()
+    auto timezoneConfig = config::ConfigManager::instance()
         ->property("timezone")
         ->setDefaultValue(DEFAULT_TIMEZONE)
         ->setChangeHandler(updateTimezone);

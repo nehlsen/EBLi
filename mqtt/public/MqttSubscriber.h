@@ -4,8 +4,7 @@
 #include <string>
 #include <functional>
 
-namespace EBLi
-{
+namespace EBLi::mqtt {
 
 class MqttSubscriber
 {

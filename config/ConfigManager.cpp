@@ -9,7 +9,7 @@
 #include "ConfigHttpModule.h"
 #endif
 
-namespace EBLi {
+namespace EBLi::config {
 
 #define NVS_NAMESPACE "ebli_config"
 // NOTE keys are limited to 15 characters
@@ -26,7 +26,7 @@ ConfigManager *ConfigManager::init()
 
 #if defined(CONFIG_EBLI_HTTP_ENABLE)
     auto srv = http::WebServer::instance();
-    srv->addModule(new config::ConfigHttpModule());
+    srv->addModule(new ConfigHttpModule());
 #endif
 
     return singleton;

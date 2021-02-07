@@ -5,7 +5,7 @@
 #include "ConfigProperty.h"
 #include <ebli_log.h>
 
-namespace EBLi::Config {
+namespace EBLi::config {
 
 #define MQTT_PROPERTY_PREFIX "config/"
 
@@ -47,7 +47,7 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
         return;
     }
 
-    auto mqtt = Mqtt::instance();
+    auto mqtt = mqtt::Mqtt::instance();
     mqtt->createSubscriber(createTopic(configProperty), [configProperty](const std::string &value) {
         ESP_LOGV(LOG_TAG_CONFIG_MQTT,
                  "Config Property Change-Callback triggered, property: '%s'",
@@ -64,7 +64,7 @@ void MqttBridge::handleRegistered(ConfigProperty *configProperty)
                      configProperty->getShortKey().c_str(), configProperty->m_type
                      );
         }
-    }, configProperty->isVisibilityGroup() ? MqttSubscriber::ScopeGroup : MqttSubscriber::ScopeDevice);
+    }, configProperty->isVisibilityGroup() ? mqtt::MqttSubscriber::ScopeGroup : mqtt::MqttSubscriber::ScopeDevice);
 
     // the subscriber will be left as dangling pointer for the rest of the program runtime
 }
@@ -81,7 +81,7 @@ void MqttBridge::handleChanged(ConfigProperty *configProperty)
         return;
     }
 
-    MqttPublisher *publisher = EBLi::Mqtt::instance()
+    mqtt::MqttPublisher *publisher = mqtt::Mqtt::instance()
             ->createPublisher(createTopic(configProperty));
 
     if (configProperty->m_type == ConfigProperty::TYPE_INT) {

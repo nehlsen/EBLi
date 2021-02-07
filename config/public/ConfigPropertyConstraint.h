@@ -1,8 +1,7 @@
 #ifndef EBLI_CONFIGPROPERTYCONSTRAINT_H
 #define EBLI_CONFIGPROPERTYCONSTRAINT_H
 
-namespace EBLi
-{
+namespace EBLi::config {
 
 class ConfigPropertyConstraint
 {

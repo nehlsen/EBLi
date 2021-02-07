@@ -1,7 +1,7 @@
 #ifndef EBLI_OTAMQTTADAPTER_H
 #define EBLI_OTAMQTTADAPTER_H
 
-namespace EBLi {
+namespace EBLi::mqtt {
 class MqttPublisher;
 }
 
@@ -19,7 +19,7 @@ private:
     void subscribeForUpdateRequests();
     void subscribeOtaEvents();
 
-    MqttPublisher *m_otaEventPublisher = nullptr;
+    mqtt::MqttPublisher *m_otaEventPublisher = nullptr;
     void createOtaEventPublisher();
 };
 

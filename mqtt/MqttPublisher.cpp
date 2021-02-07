@@ -3,7 +3,7 @@
 #include <utility>
 #include <cJSON.h>
 
-namespace EBLi {
+namespace EBLi::mqtt {
 
 MqttPublisher::MqttPublisher(Mqttp *mqtt, std::string topic, RetainFlag retainFlag):
     m_mqtt(mqtt), m_topic(std::move(topic)), m_retainFlag(retainFlag)

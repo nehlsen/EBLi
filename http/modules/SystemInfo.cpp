@@ -89,7 +89,7 @@ void SystemInfo::responseAddLastResetReason(cJSON *responseObject)
 void SystemInfo::responseAddRestartCounter(cJSON *responseObject)
 {
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
-    cJSON_AddNumberToObject(responseObject, "restarts", EBLi::ConfigManager::instance()->getRestartCounter());
+    cJSON_AddNumberToObject(responseObject, "restarts", EBLi::config::ConfigManager::instance()->getRestartCounter());
 #endif
 }
 

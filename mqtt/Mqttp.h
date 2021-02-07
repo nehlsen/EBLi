@@ -7,11 +7,13 @@
 #include "MqttSubscriber.h"
 #include "MqttPublisher.h"
 
-namespace EBLi {
-
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
+namespace EBLi::config {
 class ConfigProperty;
+}
 #endif
+
+namespace EBLi::mqtt {
 
 class Mqttp
 {
@@ -20,8 +22,8 @@ public:
 
     bool isConnected() const;
 
-    MqttSubscriber *createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope);
-    MqttPublisher *createPublisher(std::string topic, MqttPublisher::RetainFlag retainFlag);
+    MqttSubscriber *createSubscriber(const std::string& topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope);
+    MqttPublisher *createPublisher(const std::string& topic, MqttPublisher::RetainFlag retainFlag);
 
     std::string getBroker() const;
     void setBroker(const std::string& brokerUrl);
@@ -50,9 +52,9 @@ private:
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     struct Config {
         static void init();
-        static ConfigProperty *broker();
-        static ConfigProperty *deviceTopic();
-        static ConfigProperty *groupTopic();
+        static config::ConfigProperty *broker();
+        static config::ConfigProperty *deviceTopic();
+        static config::ConfigProperty *groupTopic();
     };
 #endif
 };

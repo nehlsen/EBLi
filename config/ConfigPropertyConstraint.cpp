@@ -2,8 +2,7 @@
 #include <esp_log.h>
 #include <string>
 
-namespace EBLi
-{
+namespace EBLi::config {
 
 ConfigPropertyConstraint::ConfigPropertyConstraint(int minimum, int maximum):
     m_minimum(minimum), m_maximum(maximum)

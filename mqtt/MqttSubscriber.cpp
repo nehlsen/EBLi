@@ -2,7 +2,7 @@
 #include <utility>
 #include <ebli_log.h>
 
-namespace EBLi {
+namespace EBLi::mqtt {
 
 std::string MqttSubscriber::getTopic() const
 {

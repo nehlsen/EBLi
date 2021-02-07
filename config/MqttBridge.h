@@ -1,9 +1,8 @@
 #ifndef EBLI_CONFIG_MQTTBRIDGE_H
 #define EBLI_CONFIG_MQTTBRIDGE_H
 
-namespace EBLi {
+namespace EBLi::config {
 class ConfigProperty;
-namespace Config {
 
 class MqttBridge
 {
@@ -17,7 +16,6 @@ private:
     MqttBridge() = default;
 };
 
-}
 }
 
 #endif //EBLI_CONFIG_MQTTBRIDGE_H

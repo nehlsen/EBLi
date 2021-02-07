@@ -7,8 +7,7 @@
 #include <ebli_log.h>
 #include <ebli_events.h>
 
-namespace EBLi
-{
+namespace EBLi::config {
 
 ConfigProperty::ConfigProperty(std::string shortKey, std::string longKey):
     m_shortKey(std::move(shortKey)), m_longKey(std::move(longKey))
@@ -125,7 +124,7 @@ T ConfigProperty::getValue() const
     return T();
 }
 
-ConfigProperty *ConfigProperty::setConstraint(ConfigPropertyConstraint *constraint)
+ConfigProperty *ConfigProperty::setConstraint(EBLi::config::ConfigPropertyConstraint *constraint)
 {
     m_constraint = constraint;
     return this;

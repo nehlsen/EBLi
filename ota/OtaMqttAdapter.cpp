@@ -14,15 +14,15 @@ OtaMqttAdapter::OtaMqttAdapter(OtaUpdater *updater) : m_updater(updater)
 
 void OtaMqttAdapter::subscribeForUpdateRequests()
 {
-    Mqtt::instance()->createSubscriber("ota", [=](const std::string &value) {
+    mqtt::Mqtt::instance()->createSubscriber("ota", [=](const std::string &value) {
         m_updater->setUpdateUrl(value.c_str());
         m_updater->startUpdate();
-    }, MqttSubscriber::ScopeDevice);
+    }, mqtt::MqttSubscriber::ScopeDevice);
 }
 
 static void otaEventHandler(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    auto otaEventPublisher = static_cast<MqttPublisher*>(event_handler_arg);
+    auto otaEventPublisher = static_cast<mqtt::MqttPublisher*>(event_handler_arg);
     if (nullptr == otaEventPublisher) {
         return;
     }
@@ -69,7 +69,7 @@ void OtaMqttAdapter::createOtaEventPublisher()
 {
     // FIXME atw we just post some "text" messages. it would probably be better to post some machine readable info/data
     //  possibly using 4 topics: start, progress, failed, succeed
-    m_otaEventPublisher = Mqtt::instance()->createPublisher("ota");
+    m_otaEventPublisher = mqtt::Mqtt::instance()->createPublisher("ota");
 }
 
 }

@@ -8,7 +8,7 @@
 
 class cJSON;
 
-namespace EBLi {
+namespace EBLi::config {
 
 class ConfigManager
 {

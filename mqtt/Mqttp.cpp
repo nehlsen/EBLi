@@ -8,7 +8,7 @@
 #include <ConfigPropertyConstraint.h>
 #endif
 
-namespace EBLi {
+namespace EBLi::mqtt {
 
 static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -62,7 +62,7 @@ bool Mqttp::isInitializedAndLog() const
     return true;
 }
 
-MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope)
+MqttSubscriber *Mqttp::createSubscriber(const std::string& topic, MqttSubscriber::SubscriptionCallbackType cb, MqttSubscriber::SubscriptionScope subscriptionScope)
 {
     ESP_LOGD(LOG_TAG_MQTT, "Creating subscriber for \"%s\"", topic.c_str());
 
@@ -76,7 +76,7 @@ MqttSubscriber *Mqttp::createSubscriber(std::string topic, MqttSubscriber::Subsc
     return subscriber;
 }
 
-MqttPublisher *Mqttp::createPublisher(std::string topic, MqttPublisher::RetainFlag retainFlag)
+MqttPublisher *Mqttp::createPublisher(const std::string& topic, MqttPublisher::RetainFlag retainFlag)
 {
     ESP_LOGD(LOG_TAG_MQTT, "Creating publisher for \"%s\"", topic.c_str());
 
@@ -278,21 +278,21 @@ void Mqttp::Config::init()
     groupTopic()->setDefaultValue(CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC);
 }
 
-ConfigProperty *Mqttp::Config::broker()
+config::ConfigProperty *Mqttp::Config::broker()
 {
-    return EBLi::ConfigManager::instance()
+    return config::ConfigManager::instance()
         ->property("mqtt_broker", "MqttBroker")
-        ->setConstraint(EBLi::ConfigPropertyConstraint::StringLength(64));
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::StringLength(64));
 }
 
-ConfigProperty *Mqttp::Config::deviceTopic()
+config::ConfigProperty *Mqttp::Config::deviceTopic()
 {
-    return EBLi::ConfigManager::instance()->property("mqtt_tpc_device", "MqttDeviceTopic");
+    return config::ConfigManager::instance()->property("mqtt_tpc_device", "MqttDeviceTopic");
 }
 
-ConfigProperty *Mqttp::Config::groupTopic()
+config::ConfigProperty *Mqttp::Config::groupTopic()
 {
-    return EBLi::ConfigManager::instance()->property("mqtt_tpc_group", "MqttGroupTopic");
+    return config::ConfigManager::instance()->property("mqtt_tpc_group", "MqttGroupTopic");
 }
 #endif
 

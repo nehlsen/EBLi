@@ -8,16 +8,17 @@
 
 class cJSON;
 
-namespace EBLi {
-namespace Config { class MqttBridge; }
+namespace EBLi::config {
+
 class ConfigManager;
 class ConfigPropertyConstraint;
+class MqttBridge;
 
 // FIXME value and default value could maybe be stored in a std::variant<> ?!
 class ConfigProperty
 {
 friend class ConfigManager;
-friend class Config::MqttBridge;
+friend class MqttBridge;
 
 public:
     std::string getShortKey() const;
@@ -32,7 +33,7 @@ public:
     void setValue(const std::string &value);
     template<typename T> T getValue() const;
 
-    ConfigProperty *setConstraint(ConfigPropertyConstraint *constraint);
+    ConfigProperty *setConstraint(EBLi::config::ConfigPropertyConstraint *constraint);
 
     // new value? bool: change handler may deny new value?
 //    typedef std::function<bool(ConfigProperty *property)> ChangeHandlerCallback;
@@ -76,7 +77,7 @@ private:
     int m_defaultValueInt = 0;
     std::string m_defaultValueString;
 
-    ConfigPropertyConstraint *m_constraint = nullptr;
+    EBLi::config::ConfigPropertyConstraint *m_constraint = nullptr;
     ChangeHandlerCallback m_changeHandler;
 
     Visibility m_visibility = Group;

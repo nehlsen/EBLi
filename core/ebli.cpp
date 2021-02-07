@@ -82,13 +82,13 @@ void init_all()
 
 #if defined(CONFIG_EBLI_CONFIG_MANAGER_ENABLE)
     #if defined(CONFIG_EBLI_MQTT_ENABLE)
-        EBLi::Config::MqttBridge::setup();
+        EBLi::config::MqttBridge::setup();
     #endif
-    EBLi::ConfigManager::init();
+    EBLi::config::ConfigManager::init();
 #endif
 
 #if defined(CONFIG_EBLI_MQTT_ENABLE)
-    EBLi::Mqtt::init(); // FIXME init before wifi to be able to react to on-got-ip?
+    EBLi::mqtt::Mqtt::init(); // FIXME init before wifi to be able to react to on-got-ip?
 #endif
 
 #if defined(CONFIG_EBLI_TIME_ENABLE)
