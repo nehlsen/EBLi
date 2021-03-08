@@ -34,7 +34,7 @@ protected:
 };
 
 FileSystem::FileSystem():
-        m_filesystem_uri {
+    m_filesystem_uri {
         .uri = BASE_URI FS_BASE_URI "/*",
         .method = http_method::HTTP_GET,
         .handler = FileSystem::getFileSystemHttpHandler,
